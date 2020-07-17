@@ -1,65 +1,26 @@
 import requests
 
+from tools.cons_list import *
+from tools.mod_dem import *
 from tools.multiple_draw import multipul_draw
 
 
 def modulate(a):
     """
     modulatable な何かを modulate し、01 文字列を返す。
-    https://message-from-space.readthedocs.io/en/latest/message13.html
-    https://message-from-space.readthedocs.io/en/latest/message14.html
-    https://message-from-space.readthedocs.io/en/latest/message35.html
     :param a: modulatable な何か
     :return: 01 文字列
     """
-    if a is None:
-        return '00'
-    elif type(a) is int:
-        res = []
-        if a >= 0:
-            res.append('01')
-        else:
-            res.append('10')
-        bits = '' if a == 0 else bin(abs(a))[2:]
-        bits4 = (len(bits) + 3) // 4
-        res.append('1' * bits4 + '0')
-        res.append('0' * (bits4 * 4 - len(bits)) + bits)
-        return ''.join(res)
-    elif (type(a) is tuple) and (len(a) == 2):
-        return '11' + modulate(a[0]) + modulate(a[1])
-    else:
-        print('Error! Not a modulatable object:', a)
-        exit(2)
+    return enc(cons_list_to_python_list(a))
 
 
 def demodulate(s):
     """
     01 文字列を demodulate し、modulatable な何かを返す。
-    https://message-from-space.readthedocs.io/en/latest/message13.html
-    https://message-from-space.readthedocs.io/en/latest/message14.html
-    https://message-from-space.readthedocs.io/en/latest/message35.html
     :param s: 01 文字列
     :return: modulatable な何か
     """
-
-    def dem_inner(s, k):
-        if s[k:k + 2] == '11':  # cons
-            (h, k) = dem_inner(s, k + 2)
-            (t, k) = dem_inner(s, k)
-            return (h, t), k
-        elif s[k:k + 2] == '00':  # nil
-            return None, k + 2
-        else:
-            sgn = +1 if s[k:k + 2] == '01' else -1
-            bits = 0
-            k = k + 2
-            while s[k] == '1':
-                bits += 1
-                k += 1
-            num = 0 if bits == 0 else sgn * int(s[k + 1:k + bits * 4 + 1], 2)
-            return num, k + bits * 4 + 1
-
-    return dem_inner(s, 0)[0]
+    return python_list_to_cons_list(dec(s))
 
 
 def interact(server_url, pictures_path, initial_data, initial_res):
@@ -137,20 +98,3 @@ def draw_pictures(pictures_path, pictures_cons_list):
     pictures = cons_list_to_python_list(pictures_cons_list)
     plot_vectors_list = [cons_list_to_python_list(picture) for picture in pictures]
     multipul_draw(plot_vectors_list, output_dir=pictures_path)
-
-
-def cons_list_to_python_list(cons_list):
-    """
-    cons 形式のリストを Python 形式の (普通の) リストへ変換する。
-    :param cons_list: cons 形式のリスト
-    :return: Python 形式のリスト
-    """
-    if cons_list is None:
-        return []
-    elif (type(cons_list) is tuple) and (len(cons_list) == 2):
-        head = cons_list[0]
-        tail = cons_list[1]
-        return [head] + cons_list_to_python_list(tail)
-    else:
-        print('Error! Not a cons list:', cons_list)
-        exit(2)
