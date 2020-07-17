@@ -1,10 +1,10 @@
 import requests
 import sys
 
-from tools.cons_list import *
-from tools.galaxy_lazy import LazyGalaxy
-from tools.mod_dem import *
-from tools.multiple_draw import *
+from cons_list import *
+from galaxy_lazy import LazyGalaxy
+from mod_dem import *
+from multiple_draw import *
 
 
 def main():
@@ -12,11 +12,13 @@ def main():
     server_url = sys.argv[2]
     pictures_path = sys.argv[3]
 
+    sys.setrecursionlimit(1000000)
+
     galaxy = LazyGalaxy(galaxy_path)
     interact(server_url, pictures_path, galaxy)
 
 
-def interact(server_url, pictures_path, galaxy, initial_data=None, initial_res=None):
+def interact(server_url, pictures_path, galaxy, initial_data=None, initial_res=(1, 1)):
     """
     初期データと初期レスポンスを元に、Galaxy の実行およびサーバーとの通信を行い、最終的に画像を出力する。
     :param server_url: サーバー URL
@@ -39,8 +41,8 @@ def interact(server_url, pictures_path, galaxy, initial_data=None, initial_res=N
         print('[Galaxy] Output request:', req)
 
         if continue_flag == 0:
-            print('[Draw] Pictures:', res)
-            draw_pictures(pictures_path, res)
+            print('[Draw] Pictures:', req)
+            draw_pictures(pictures_path, req)
             break
 
         print('[Send] Request:', req)
