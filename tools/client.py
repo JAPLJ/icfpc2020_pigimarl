@@ -1,6 +1,6 @@
 import requests
 
-from app.multiple_draw import multipul_draw
+from tools.multiple_draw import multipul_draw
 
 
 def modulate(a):
