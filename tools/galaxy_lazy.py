@@ -11,6 +11,8 @@ import sys
 
 class Thunk:
     def __init__(self, v):
+        self.done = False
+        self.cache = None
         self.v = v
 
 
@@ -27,9 +29,15 @@ class App:
 
 def ev(v):
     while isinstance(v, Thunk):
-        v = v.v()
+        v0 = v
+        if v.done:
+            v = v.cache
+        else:
+            v = v.v()
         if isinstance(v, App):
             v = peel(ev(v.fn))(v.arg)
+        v0.done = True
+        v0.cache = v
     return v
 
 
@@ -111,9 +119,7 @@ class LazyGalaxy:
     
     def evaluate(self, sym):
         """sym に対応するシンボルの値を評価して返す"""
-        if sym not in self.memo:
-            self.memo[sym] = ev(self.symbols[sym])
-        return self.memo[sym]
+        return ev(self.symbols[sym])
 
     def eval_galaxy(self, arg1, arg2):
         """
@@ -180,7 +186,7 @@ def main(filename):
     sys.setrecursionlimit(1000000)
     
     galaxy = LazyGalaxy(sys.argv[1])
-    
+   
     while True:
         try:
             sym = input()
