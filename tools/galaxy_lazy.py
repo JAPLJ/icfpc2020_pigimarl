@@ -9,9 +9,6 @@ import sys
 ## basic definitions
 ##
 
-symbols = dict()
-
-
 class Thunk:
     def __init__(self, v):
         self.v = v
@@ -26,26 +23,6 @@ class App:
     def __init__(self, fn, arg):
         self.fn = fn
         self.arg = arg
-
-
-class Cons:
-    def __init__(self, car, cdr):
-        self.car = car
-        self.cdr = cdr
-    
-    def __repr__(self):
-        res = []
-        res.append('Cons(')
-        res.append(str(ev(self.car)))
-        res.append(',')
-        res.append(str(ev(self.cdr)))
-        res.append(')')
-        return ''.join(res)
-
-
-class Nil:
-    def __repr__(self):
-        return 'Nil'
 
 
 def ev(v):
@@ -87,11 +64,11 @@ p_i = Lambda(lambda x: Thunk(lambda: x))
 p_s = Lambda(lambda x: Lambda(lambda y: Lambda(lambda z: Thunk(lambda: apply(apply(x)(z))(apply(y)(z))))))
 
 # list
-p_cons = Lambda(lambda x: Lambda(lambda xs: Thunk(lambda: Cons(x, xs))))
-p_car = Lambda(lambda x: Thunk(lambda: ev(x).car))
-p_cdr = Lambda(lambda x: Thunk(lambda: ev(x).cdr))
-p_nil = Thunk(lambda: Nil())
-p_isnil = Lambda(lambda x: Thunk(lambda: p_t if isinstance(ev(x), Nil) else p_f))
+p_cons = Lambda(lambda x: Lambda(lambda y: Lambda(lambda z: Thunk(lambda: apply(apply(z)(x))(y)))))
+p_car = Lambda(lambda x: Thunk(lambda: apply(x)(p_t)))
+p_cdr = Lambda(lambda x: Thunk(lambda: apply(x)(p_f)))
+p_nil = Lambda(lambda x: Thunk(lambda: p_t))
+p_isnil = Lambda(lambda x: Thunk(lambda: apply(x)(Lambda(lambda h: Lambda(lambda t: Thunk(lambda: p_f))))))
 
 
 PRIMITIVES = {
@@ -121,19 +98,53 @@ PRIMITIVES = {
 ## parser
 ##
 
-def parse(toks):
-    def parse_inner(ptr):
-        if toks[ptr] == 'ap':
-            (fn, ptr) = parse_inner(ptr + 1)
-            (arg, ptr) = parse_inner(ptr)
-            return (apply(fn)(arg), ptr)
-        elif toks[ptr] in PRIMITIVES:
-            return (PRIMITIVES[toks[ptr]], ptr + 1)
-        elif toks[ptr][0] == '-' or toks[ptr].isdigit():
-            return (Thunk(lambda: int(toks[ptr])), ptr + 1)
-        else:
-            return (Thunk(lambda: symbols[toks[ptr]]), ptr + 1)
-    return parse_inner(0)[0]
+class LazyGalaxy:
+    def __init__(self, filename):
+        self.symbols = dict()
+        self.memo = dict()
+        with open(filename) as f:
+            for line in f.readlines():
+                toks = line.split()
+                self.symbols[toks[0]] = self.__parse(toks[2:])
+        print('Successfully parsed')
+    
+    def evaluate(self, sym):
+        if sym not in self.memo:
+            self.memo[sym] = ev(self.symbols[sym])
+        return self.memo[sym]
+
+    def __parse(self, toks):
+        def parse_inner(ptr):
+            if toks[ptr] == 'ap':
+                (fn, ptr) = parse_inner(ptr + 1)
+                (arg, ptr) = parse_inner(ptr)
+                return (apply(fn)(arg), ptr)
+            elif toks[ptr] in PRIMITIVES:
+                return (PRIMITIVES[toks[ptr]], ptr + 1)
+            elif toks[ptr][0] == '-' or toks[ptr].isdigit():
+                return (Thunk(lambda: int(toks[ptr])), ptr + 1)
+            else:
+                return (Thunk(lambda: self.symbols[toks[ptr]]), ptr + 1)
+        return parse_inner(0)[0]
+
+
+##
+## utils
+##
+
+def check_bool(v):
+    return ev(apply(apply(v)(Thunk(lambda: True)))(Thunk(lambda: False)))
+
+def pretty(v):
+    if isinstance(v, int):
+        return str(v)
+    elif check_bool(ev(apply(p_isnil)(v))):
+        return 'Nil'
+    else:
+        car = ev(apply(p_car)(v))
+        cdr = ev(apply(p_cdr)(v))
+        return f'Cons({pretty(car)},{pretty(cdr)})'
+
 
 ##
 ## main
@@ -142,16 +153,12 @@ def parse(toks):
 def main(filename):
     sys.setrecursionlimit(1000000)
     
-    with open(filename) as f:
-        for line in f.readlines():
-            toks = line.split()
-            symbols[toks[0]] = parse(toks[2:])
-    print('Successfully parsed')
+    galaxy = LazyGalaxy(sys.argv[1])
     
     while True:
         try:
             sym = input()
-            print(ev(symbols[sym]))
+            print(pretty(galaxy.evaluate(sym)))
         except EOFError:
             break
 
