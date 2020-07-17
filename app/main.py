@@ -15,6 +15,14 @@ def main():
         exit(2)
     print('Server response:', res.text)
 
+    res = requests.post(server_url, data='010')
+    if res.status_code != 200:
+        print('Unexpected server response:')
+        print('HTTP code:', res.status_code)
+        print('Response body:', res.text)
+        exit(2)
+    print('Server response:', res.text)
+
 
 if __name__ == '__main__':
     main()
