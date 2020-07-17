@@ -8,6 +8,7 @@ import numpy as np
 def draw(
         plot_vectors: List[Tuple[int, int]],
         imagemap_size: Tuple[int, int] = (50, 50),
+        offset_pos: Tuple[int, int] = (0, 0),
         draw_size: int = 10,
         output_dir: str = '',
         filename: str = 'draw.png',
@@ -28,8 +29,8 @@ def draw(
         dtype=np.uint8
     )
     for vector in plot_vectors:
-        x = vector[0] * draw_size
-        y = vector[1] * draw_size
+        x = (vector[0] - offset_pos[0]) * draw_size
+        y = (vector[1] - offset_pos[1]) * draw_size
         cv2.rectangle(
             img,
             (x, y),
@@ -54,12 +55,19 @@ def multipul_draw(
     draw_sizeは1プロットあたりの大きさ。
     filenameは <filename_suffix>_<i>.png で連番
     """
-    width = 0
-    height = 0
+    min_x = 10000
+    max_x = -1
+    min_y = 10000
+    max_y = -1
     for plot_vectors in plot_vectors_list:
         for x, y in plot_vectors:
-            width = x if x > width else width
-            height = y if y > height else height
+            min_x = min(min_x, x)
+            max_x = max(max_x, x)
+            min_y = min(min_y, y)
+            max_y = max(max_y, y)
+
+    width = max_x - min_x + 1
+    height = max_y - min_y + 1
 
     for i in range(len(plot_vectors_list)):
         plot_vectors = plot_vectors_list[i]
@@ -67,6 +75,7 @@ def multipul_draw(
         draw(
             plot_vectors=plot_vectors,
             imagemap_size=(width, height),
+            offset_pos=(min_x, min_y),
             draw_size=draw_size,
             output_dir=output_dir,
             filename=filename,

@@ -18,7 +18,7 @@ def main():
     interact(server_url, pictures_path, galaxy)
 
 
-def interact(server_url, pictures_path, galaxy, initial_data=None, initial_res=(1, 1)):
+def interact(server_url, pictures_path, galaxy, initial_data=(1, ((11, None), (0, (None, None)))), initial_res=(0, 0)):
     """
     初期データと初期レスポンスを元に、Galaxy の実行およびサーバーとの通信を行い、最終的に画像を出力する。
     :param server_url: サーバー URL
@@ -41,7 +41,6 @@ def interact(server_url, pictures_path, galaxy, initial_data=None, initial_res=(
         print('[Galaxy] Output request:', req)
 
         if continue_flag == 0:
-            print('[Draw] Pictures:', req)
             draw_pictures(pictures_path, req)
             break
 
@@ -82,6 +81,7 @@ def draw_pictures(pictures_path, pictures_cons_list):
     """
     pictures = cons_list_to_python_list(pictures_cons_list)
     plot_vectors_list = [cons_list_to_python_list(picture) for picture in pictures]
+    print('[Draw] Pictures:', plot_vectors_list)
     multipul_draw(plot_vectors_list, output_dir=pictures_path)
 
 
