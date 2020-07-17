@@ -56,7 +56,6 @@ def interact(server_url, pictures_path, initial_data, initial_res):
 def send(server_url, req):
     """
     リクエストをサーバーへ送り、レスポンスを返す。
-    https://icfpc2020-api.testkontur.ru/aliens/send?apiKey=c16bab7da69d411da59ce8227e5d9034
     :param server_url サーバー URL
     :param req: リクエスト
     :return: レスポンス
