@@ -5,24 +5,6 @@ from tools.mod_dem import *
 from tools.multiple_draw import multipul_draw
 
 
-def modulate(a):
-    """
-    modulatable な何かを modulate し、01 文字列を返す。
-    :param a: modulatable な何か
-    :return: 01 文字列
-    """
-    return enc(cons_list_to_python_list(a))
-
-
-def demodulate(s):
-    """
-    01 文字列を demodulate し、modulatable な何かを返す。
-    :param s: 01 文字列
-    :return: modulatable な何か
-    """
-    return python_list_to_cons_list(dec(s))
-
-
 def interact(server_url, pictures_path, initial_data, initial_res):
     """
     初期データと初期レスポンスを元に、Galaxy の実行およびサーバーとの通信を行い、最終的に画像を出力する。
@@ -60,7 +42,7 @@ def send(server_url, req):
     :param req: リクエスト
     :return: レスポンス
     """
-    mod_req = modulate(req)
+    mod_req = enc_from_cons_obj(req)
     http_res = requests.post(server_url, data=mod_req)
 
     if http_res.status_code != 200:
@@ -72,7 +54,7 @@ def send(server_url, req):
         exit(2)
 
     mod_res = http_res.text
-    res = demodulate(mod_res)
+    res = dec_to_cons_obj(mod_res)
     return res
 
 
