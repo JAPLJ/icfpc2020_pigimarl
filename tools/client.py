@@ -1,15 +1,27 @@
 import requests
+import sys
 
 from tools.cons_list import *
+from tools.galaxy_lazy import LazyGalaxy
 from tools.mod_dem import *
-from tools.multiple_draw import multipul_draw
+from tools.multiple_draw import *
 
 
-def interact(server_url, pictures_path, initial_data, initial_res):
+def main():
+    galaxy_path = sys.argv[1]
+    server_url = sys.argv[2]
+    pictures_path = sys.argv[3]
+
+    galaxy = LazyGalaxy(galaxy_path)
+    interact(server_url, pictures_path, galaxy)
+
+
+def interact(server_url, pictures_path, galaxy, initial_data=None, initial_res=None):
     """
     初期データと初期レスポンスを元に、Galaxy の実行およびサーバーとの通信を行い、最終的に画像を出力する。
     :param server_url: サーバー URL
     :param pictures_path: 画像の出力先
+    :param galaxy: Galaxy
     :param initial_data: 初期データ
     :param initial_res: 初期レスポンス
     :return: None
@@ -20,7 +32,8 @@ def interact(server_url, pictures_path, initial_data, initial_res):
     while True:
         print('[Galaxy] Input data:', data)
         print('[Galaxy] Input response:', res)
-        continue_flag, data, req = galaxy([data, res])
+        cons_list = galaxy.eval_galaxy(data, res)
+        continue_flag, data, req = cons_list_to_python_list(cons_list)
         print('[Galaxy] Output continue flag:', continue_flag)
         print('[Galaxy] Output data:', data)
         print('[Galaxy] Output request:', req)
@@ -58,17 +71,6 @@ def send(server_url, req):
     return res
 
 
-def galaxy(data, res):
-    """
-    データとレスポンスを受け取り、次の (継続フラグ, データ, リクエスト) を返す。
-    japlj さんが書いてくれてる。
-    :param data: データ
-    :param res: レスポンス
-    :return: 長さ 3 の リスト (継続フラグ, データ, リクエスト)
-    """
-    pass
-
-
 def draw_pictures(pictures_path, pictures_cons_list):
     """
     指定のパスに画像たちを出力する。
@@ -79,3 +81,7 @@ def draw_pictures(pictures_path, pictures_cons_list):
     pictures = cons_list_to_python_list(pictures_cons_list)
     plot_vectors_list = [cons_list_to_python_list(picture) for picture in pictures]
     multipul_draw(plot_vectors_list, output_dir=pictures_path)
+
+
+if __name__ == '__main__':
+    main()
