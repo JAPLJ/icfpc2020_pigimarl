@@ -100,6 +100,7 @@ PRIMITIVES = {
 
 class LazyGalaxy:
     def __init__(self, filename):
+        """filename で指定されたファイルを読み込んでパースする"""
         self.symbols = dict()
         self.memo = dict()
         with open(filename) as f:
@@ -109,9 +110,20 @@ class LazyGalaxy:
         print('Successfully parsed')
     
     def evaluate(self, sym):
+        """sym に対応するシンボルの値を評価して返す"""
         if sym not in self.memo:
             self.memo[sym] = ev(self.symbols[sym])
         return self.memo[sym]
+
+    def eval_galaxy(self, arg1, arg2):
+        """
+        `galaxy` シンボルに arg1, arg2 の二つの引数を与えて評価する
+        Python の値を受け取って Python の値を返す
+        """
+        arg1, arg2 = to_lambda(arg1), to_lambda(arg2)
+        galaxy = self.evaluate('galaxy')
+        v = ev(apply(apply(galaxy)(arg1))(arg2))
+        return from_lambda(v)
 
     def __parse(self, toks):
         def parse_inner(ptr):
@@ -132,19 +144,33 @@ class LazyGalaxy:
 ## utils
 ##
 
-def check_bool(v):
-    return ev(apply(apply(v)(Thunk(lambda: True)))(Thunk(lambda: False)))
+def to_lambda(v):
+    """cons 形式のリストかスカラー値を lambda calculus 表現に直す"""
+    if v is None:
+        return p_nil
+    elif type(v) is int:
+        return v
+    elif (type(v) is tuple) and (len(v) == 2):
+        head, tail = v[0], v[1]
+        return apply(apply(p_cons)(to_lambda(head)))(to_lambda(tail))
+    else:
+        print('ValueError: ', v)
+        exit(2)
 
-def pretty(v):
+def from_lambda(v):
+    """lambda calculus 表現の値を cons 形式のリストかスカラー値に直す"""
     if isinstance(v, int):
-        return str(v)
+        return v
     elif check_bool(ev(apply(p_isnil)(v))):
-        return 'Nil'
+        return None
     else:
         car = ev(apply(p_car)(v))
         cdr = ev(apply(p_cdr)(v))
-        return f'Cons({pretty(car)},{pretty(cdr)})'
+        return (from_lambda(car), from_lambda(cdr))
 
+def check_bool(v):
+    """lambda calculus の TRUE / FALSE を Python の True / False に直す"""
+    return ev(apply(apply(v)(Thunk(lambda: True)))(Thunk(lambda: False)))
 
 ##
 ## main
@@ -158,7 +184,7 @@ def main(filename):
     while True:
         try:
             sym = input()
-            print(pretty(galaxy.evaluate(sym)))
+            print(from_lambda(galaxy.evaluate(sym)))
         except EOFError:
             break
 
