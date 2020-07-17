@@ -7,7 +7,7 @@ def main():
     player_key = sys.argv[2]
     print('ServerUrl: %s; PlayerKey: %s' % (server_url, player_key))
 
-    res = requests.post(server_url, data=player_key)
+    res = requests.post(server_url, data='010')
     if res.status_code != 200:
         print('Unexpected server response:')
         print('HTTP code:', res.status_code)
