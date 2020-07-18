@@ -12,7 +12,6 @@ def draw(
         filename: str = 'draw.png',
         draw_color: Tuple[int, int, int] = (255, 255, 255),
         bg_color: Tuple[int, int, int] = (25, 25, 25),
-        offset: Tuple[int, int] = (156, 108),  # 大宇宙 galaxy
         show_grid: bool = True
 ) -> None:
     """
@@ -62,8 +61,8 @@ def draw(
             (10, (100, 180, 100)),
             (50, (100, 100, 200))
         ]
-        origin_x = offset[0] * draw_size
-        origin_y = offset[1] * draw_size
+        origin_x = -min_x*draw_size
+        origin_y = -min_y*draw_size
         for grid_step, color in step_colors:
             step = draw_size * grid_step
             img[origin_y % step:img_y + origin_y:step, :, :] = color
