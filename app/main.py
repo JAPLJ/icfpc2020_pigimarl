@@ -15,7 +15,7 @@ def main():
         exit(2)
     print('Server response:', res.text)
 
-    res = requests.post(server_url, data='(2, '+player_key+', ('+None+'))')
+    res = requests.post(server_url, data='(2, '+player_key+', (nil))')
     if res.status_code != 200:
         print('Unexpected server response:')
         print('HTTP code:', res.status_code)
