@@ -1,10 +1,11 @@
-from pathlib import Path
 from typing import List, Tuple, Optional
+from pathlib import Path
 
 import cv2
 import numpy as np
+from annotate_picture import Annotation
 
-draw_colors = [
+DRAW_CORORS = [
     (80, 200, 200),
     (200, 80, 200),
     (200, 200, 80),
@@ -14,13 +15,14 @@ draw_colors = [
     (150, 80, 200),
     (80, 200, 150),
 ]
+FONT = cv2.FONT_HERSHEY_SIMPLEX
 
 
 def index_to_color_alpha(i: int) -> Tuple[Tuple[int, int, int], int]:
     if i == 0:
         return (255, 255, 255), 1
     else:
-        return draw_colors[(i-1) % len(draw_colors)], 0.7
+        return DRAW_CORORS[(i-1) % len(DRAW_CORORS)], 0.7
 
 
 def draw_grid(img: np.ndarray, min_x, min_y, draw_size=10) -> np.ndarray:
@@ -41,14 +43,13 @@ def draw_grid(img: np.ndarray, min_x, min_y, draw_size=10) -> np.ndarray:
     img[origin_y:origin_y + 2, :, :] = white
     img[:, origin_x:origin_x + 2, :] = white
     # draw grid num
-    font = cv2.FONT_HERSHEY_SIMPLEX
     text_step = 10 * draw_size
     for y in range(origin_y % text_step, img_y, text_step):
         x = origin_x
         cv2.putText(
             img,
             str(int((origin_y - y)/draw_size)), (x, y),
-            font,
+            FONT,
             0.7,
             white,
             1,
@@ -59,12 +60,48 @@ def draw_grid(img: np.ndarray, min_x, min_y, draw_size=10) -> np.ndarray:
         cv2.putText(
             img,
             str(int((x - origin_x)/draw_size)), (x, y),
-            font,
+            FONT,
             0.7,
             white,
             1,
             cv2.LINE_AA
         )
+    return img
+
+
+def draw_annotation_list(
+    img: np.ndarray,
+    annotation_list: List[Annotation],
+    draw_size: int,
+    min_x: int,
+    min_y: int,
+    color: Tuple[int, int, int] = (0, 100, 0)
+):
+    tmp = np.zeros(img.shape, np.uint8)
+    for annotation in annotation_list:
+        x0 = (annotation.min_x - min_x) * draw_size
+        y0 = (annotation.min_y - min_y) * draw_size
+        x1 = (annotation.max_x - min_x) * draw_size
+        y1 = (annotation.max_x - min_y) * draw_size
+
+        cv2.rectangle(
+            tmp,
+            (x0, y0),
+            (x1, y1),
+            color,
+            cv2.FILLED
+        )
+        cv2.putText(
+            img,
+            str(annotation.val),
+            (x0, y1),
+            FONT,
+            1,
+            (255, 255, 255),
+            2,
+            cv2.LINE_AA
+        )
+    img = cv2.addWeighted(img, 1, tmp, 0.7, 1)
     return img
 
 
@@ -76,6 +113,7 @@ def draw(
         draw_color: Tuple[int, int, int] = (255, 255, 255),
         bg_color: Tuple[int, int, int] = (25, 25, 25),
         show_grid: bool = True,
+        annotation_list: Optional[List[Annotation]] = None
 ) -> None:
     """
     output_dir配下にimage_size*draw_sizeの大きさの filename(png) を描画・保存する。
@@ -123,6 +161,15 @@ def draw(
             draw_size=draw_size
         )
 
+    if annotation_list is not None:
+        img = draw_annotation_list(
+            img=img,
+            annotation_list=annotation_list,
+            draw_size=draw_size,
+            min_x=min_x,
+            min_y=min_y,
+        )
+
     cv2.imwrite(str(output_path), img)
     return img
 
@@ -134,6 +181,7 @@ def multipul_draw(
         filename_suffix: str = 'draw',
         draw_color: Tuple[int, int, int] = (255, 255, 255),
         bg_color: Tuple[int, int, int] = (25, 25, 25),
+        annotation_lists: Optional[List[List[Annotation]]] = None
 ) -> None:
     """
     output_dir配下にpngを描画する.
@@ -151,9 +199,14 @@ def multipul_draw(
             filename=filename,
             draw_color=draw_color,
             bg_color=bg_color,
+            annotation_list=annotation_lists[i]
         )
 
-    multilayer_draw(plot_vectors_list=plot_vectors_list, output_dir=output_dir)
+    multilayer_draw(
+        plot_vectors_list=plot_vectors_list,
+        output_dir=output_dir,
+        annotation_lists=annotation_lists
+    )
 
 
 def multilayer_draw(
@@ -164,6 +217,7 @@ def multilayer_draw(
         draw_color: Tuple[int, int, int] = (255, 255, 255),
         bg_color: Tuple[int, int, int] = (25, 25, 25),
         show_grid: bool = True,
+        annotation_lists: Optional[List[List[Annotation]]] = None
 ) -> None:
     min_x = 10000
     max_x = -10000
@@ -214,4 +268,13 @@ def multilayer_draw(
         min_y=min_y,
         draw_size=draw_size
     )
+    if annotation_lists is not None:
+        for annotation_list in annotation_lists:
+            img = draw_annotation_list(
+                img=img,
+                annotation_list=annotation_list,
+                draw_size=draw_size,
+                min_x=min_x,
+                min_y=min_y,
+            )
     cv2.imwrite(str(output_path), img)
