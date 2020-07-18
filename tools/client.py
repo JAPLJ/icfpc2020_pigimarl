@@ -18,7 +18,7 @@ def main():
     interact(server_url, pictures_path, galaxy)
 
 
-def interact(server_url, pictures_path, galaxy, initial_data=(1, ((11, None), (0, (None, None)))), initial_res=(0, 0)):
+def interact(server_url, pictures_path, galaxy, initial_data=(5, ((0, None), (0, (None, None)))), initial_res=(0, 0)):
     """
     初期データと初期レスポンスを元に、Galaxy の実行およびサーバーとの通信を行い、最終的に画像を出力する。
     :param server_url: サーバー URL

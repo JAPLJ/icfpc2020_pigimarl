@@ -92,6 +92,6 @@ def enc_from_cons_obj(l):
         else:
             res = []
             res.append('11')
-            res.append(enc(l[0]))
-            res.append(enc(l[1]))
+            res.append(enc_from_cons_obj(l[0]))
+            res.append(enc_from_cons_obj(l[1]))
             return ''.join(res)
