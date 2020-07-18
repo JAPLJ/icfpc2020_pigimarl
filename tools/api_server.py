@@ -1,3 +1,15 @@
+"""
+Galaxy との interaction を行うための API サーバー。
+(state, vector) のペアを送ると、(次の state, 画像たちの情報) を返す。
+
+起動方法:
+icfpc2020_pigimarl ディレクトリで
+python3 tools/api_server.py galaxy.txt 'https://icfpc2020-api.testkontur.ru/aliens/send?apiKey=c16bab7da69d411da59ce8227e5d9034'
+
+エンドポイントの叩き方:
+url -X POST -H "Content-Type: application/json" -d '{"state": "None", "vector":[0, 0]}' http://127.0.0.1:5000/interact
+"""
+
 import json
 
 from flask import Flask, request
