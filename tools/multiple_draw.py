@@ -79,6 +79,7 @@ def draw_annotation_list(
         color: Tuple[int, int, int] = (0, 100, 0)
 ):
     tmp = np.zeros(img.shape, np.uint8)
+    # 透過マスク
     for annotation in annotation_list:
         x0 = (annotation.min_x - min_x) * draw_size
         y0 = (annotation.min_y - min_y) * draw_size
@@ -92,17 +93,32 @@ def draw_annotation_list(
             color,
             cv2.FILLED
         )
+    img = cv2.addWeighted(img, 0.8, tmp, 0.5, 1)
+    # もっかいテキスト塗る
+    for annotation in annotation_list:
+        x0 = (annotation.min_x - min_x) * draw_size
+        y0 = (annotation.min_y - min_y) * draw_size
+        y1 = (annotation.max_y - min_y) * draw_size
         cv2.putText(
             img,
             str(annotation.val),
             (x0, y1),
             FONT,
-            1,
-            (255, 255, 255),
+            (y1-y0)/50, 
+            (0, 0, 0),
             2,
             cv2.LINE_AA
         )
-    img = cv2.addWeighted(img, 1, tmp, 0.7, 1)
+        cv2.putText(
+            img,
+            str(annotation.val),
+            (x0, y1),
+            FONT,
+            (y1-y0)/50, 
+            (255, 255, 255),
+            1,
+            cv2.LINE_AA
+        )
     return img
 
 
