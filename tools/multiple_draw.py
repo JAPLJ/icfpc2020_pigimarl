@@ -60,8 +60,8 @@ def draw(
         (10, (100, 180, 100)),
         (50, (100, 100, 200))
     ]
-    origin_x = 156 * draw_size
-    origin_y = 108 * draw_size
+    origin_x = offset[0] * draw_size
+    origin_y = offset[1] * draw_size
     for grid_step, color in step_colors:
         step = draw_size * grid_step
         img[origin_y % step:img_y + origin_y:step, :, :] = color
