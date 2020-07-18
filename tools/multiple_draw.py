@@ -222,7 +222,8 @@ def multipul_draw(
     multilayer_draw(
         plot_vectors_list=plot_vectors_list,
         output_dir=output_dir,
-        annotation_lists=annotation_lists
+        annotation_lists=annotation_lists,
+        filename=f'{filename_suffix}_layered.png',
     )
 
 
