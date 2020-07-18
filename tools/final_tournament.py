@@ -3,6 +3,8 @@ import sys
 
 from mod_dem import *
 
+prev_res = None
+
 
 def main():
     server_url = sys.argv[1]
@@ -16,19 +18,24 @@ def main():
 
 
 def send(server_url, python_list):
-    print('Request:', python_list)
+    global prev_res
+
+    # print('Request:', python_list)
     # print('Modulated request:', enc(python_list))
 
     res = requests.post(server_url, data=enc(python_list))
 
     if res.status_code != 200:
+        print('Previous server response:', dec(prev_res))
         print('Unexpected server response:')
         print('HTTP code:', res.status_code)
         print('Response body:', res.text)
         exit(2)
 
     # print('Modulated server response:', res.text)
-    print('Server response:', dec(res.text))
+    # print('Server response:', dec(res.text))
+
+    prev_res = res.text
 
 
 if __name__ == '__main__':
