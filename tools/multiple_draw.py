@@ -50,6 +50,19 @@ def draw(
             draw_color,
             -1
         )
+
+    img_y, img_x = img.shape[:2]
+    step_colors = [
+        (1, (80,80,80)),
+        (5, (200,100,100)),
+        (10, (100,200,100)),
+        (50, (100,100,200))
+    ]
+    for grid_step, color in step_colors:
+        step = draw_size * grid_step
+        img[step:img_y:step, :, :] = color
+        img[:, step:img_x:step, :] = color
+
     cv2.imwrite(str(output_path), img)
 
 
