@@ -10,12 +10,55 @@
   <div id="app">
     <v-app>
         <v-main>
-        <v-container>
+          <v-navigation-drawer
+          v-model="drawer"
+          :color="color"
+          :expand-on-hover="expandOnHover"
+          :mini-variant="miniVariant"
+          :right="right"
+          :permanent="permanent"
+          width="400"
+          permanent
+          dark
+          app
+        >
+          <v-list
+            dense
+            nav
+            class="py-0"
+          >
+            <v-list-item two-line :class="miniVariant && 'px-0'">
+              <v-list-item-content>
+                <v-list-item-title>Log</v-list-item-title>
+              </v-list-item-content>
+            </v-list-item>
+            <v-divider></v-divider>
+            <v-simple-table>
+              <template v-slot:default>
+                <thead>
+                  <tr>
+                    <th class="text-left">State</th>
+                    <th class="text-left">Input Data</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="(data, i) in log" :key="i">
+                    <td>{{ data.state}}</td>
+                    <td>{{ data.input }}</td>
+                  </tr>
+                </tbody>
+              </template>
+            </v-simple-table>
+  
+          </v-list>
+        </v-navigation-drawer> 
+        <v-container fluid>
             <vue-p5 v-on="this"
             @mouseClicked="mouseClicked"
             ></vue-p5>
             <v-row>
               <div>
+                <v-checkbox v-model="clickPosting" label="Click Post"></v-checkbox>
                 <v-btn :disabled="calcWaiting" @click="onClickPost()">Post</v-btn>
                   <v-text-field
                    :disabled="calcWaiting"
@@ -46,11 +89,15 @@
   
   <script>
     POST_ENDPOINT = "http://127.0.0.1:5000/interact"
+
+    initState = "(1, ((11, None), (0, (None, None))))"
     
     new Vue({
       el: '#app',
       vuetify: new Vuetify(),
       data: {
+        clickPosting: true,
+        log: [],
         calcWaiting: false,
         multiple_draw: [
           [],
@@ -61,13 +108,14 @@
         pixelWidth: 1200,
         colors: [
           [255,255,255,1.0],
-          [255,200,0, 0.6],
-          [0,255,200, 0.6],
-          [255,200,0, 0.6],
-          [200,100,0, 0.6],
-          [0,200,100, 0.6],
+          [255,200,80, 0.6],
+          [80,255,200, 0.6],
+          [200,80 ,255, 0.6],
+          [200,100,80, 0.6],
+          [80,200,100, 0.6],
+          [100,80,200, 0.6],
         ],
-        state: "(1, ((11, None), (0, (None, None))))",
+        state: initState,
         inputData: [0,0]
       },
       computed:{
@@ -113,6 +161,11 @@
       },
       methods: {
         async onClickPost(){
+          const logData = {
+            input: this.inputDataJson,
+            state: this.state
+          }
+          this.log.push(logData)
           this.calcWaiting = true
           axios.post(POST_ENDPOINT, {
             vector: this.inputData,
@@ -152,6 +205,11 @@
             const vec = this.pixelPointToVector([sk.mouseX, sk.mouseY]);
             console.log(vec);
             this.inputData = vec
+            if(this.clickPosting && !this.calcWaiting) {
+              this.$nextTick(()=>{
+                this.onClickPost()
+              })
+            }
           }
         },
         sketchEvent(sketch) {
