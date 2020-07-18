@@ -1,10 +1,10 @@
 import requests
 import sys
 
-from tools.mod_dem import *
+from mod_dem import *
 
 
-def final_tournament():
+def main():
     server_url = sys.argv[1]
     player_key = int(sys.argv[2])
     print('ServerUrl: %s; PlayerKey: %s' % (server_url, player_key))
