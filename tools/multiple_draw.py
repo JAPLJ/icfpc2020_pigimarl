@@ -83,7 +83,7 @@ def draw_annotation_list(
         x0 = (annotation.min_x - min_x) * draw_size
         y0 = (annotation.min_y - min_y) * draw_size
         x1 = (annotation.max_x - min_x) * draw_size
-        y1 = (annotation.max_x - min_y) * draw_size
+        y1 = (annotation.max_y - min_y) * draw_size
 
         cv2.rectangle(
             tmp,
