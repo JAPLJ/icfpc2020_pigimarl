@@ -35,7 +35,7 @@ def send(server_url, python_list):
     print('Request:', python_list)
     # print('Modulated request:', enc(python_list))
 
-    res = requests.post(server_url + '/aliens/send', data=enc(python_list))
+    res = requests.post(server_url + '/aliens/send?apiKey=c16bab7da69d411da59ce8227e5d9034', data=enc(python_list))
 
     if res.status_code != 200:
         # print('Previous server response:', dec(prev_res))
