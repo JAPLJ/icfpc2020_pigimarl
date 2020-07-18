@@ -12,6 +12,7 @@ def draw(
         filename: str = 'draw.png',
         draw_color: Tuple[int, int, int] = (255, 255, 255),
         bg_color: Tuple[int, int, int] = (25, 25, 25),
+        offset: Tuple[int, int] = (156, 108)  # 大宇宙 galaxy
 ) -> None:
     """
     output_dir配下にimage_size*draw_sizeの大きさの filename(png) を描画・保存する。
@@ -51,17 +52,22 @@ def draw(
             -1
         )
 
+    # draw grid
     img_y, img_x = img.shape[:2]
     step_colors = [
-        (1, (80,80,80)),
-        (5, (200,100,100)),
-        (10, (100,200,100)),
-        (50, (100,100,200))
+        (1, (80, 80, 80)),
+        (5, (200, 100, 100)),
+        (10, (100, 180, 100)),
+        (50, (100, 100, 200))
     ]
+    origin_x = 156 * draw_size
+    origin_y = 108 * draw_size
     for grid_step, color in step_colors:
         step = draw_size * grid_step
-        img[step:img_y:step, :, :] = color
-        img[:, step:img_x:step, :] = color
+        img[origin_y % step:img_y + origin_y:step, :, :] = color
+        img[:, origin_x % step:img_x + origin_x:step, :] = color
+    img[origin_y:origin_y + 2, :, :] = (255, 255, 255)
+    img[:, origin_x:origin_x + 2, :] = (255, 255, 255)
 
     cv2.imwrite(str(output_path), img)
 
