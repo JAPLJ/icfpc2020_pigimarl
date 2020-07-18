@@ -9,10 +9,10 @@ def final_tournament():
     player_key = int(sys.argv[2])
     print('ServerUrl: %s; PlayerKey: %s' % (server_url, player_key))
 
-    send(server_url, [2, player_key, []])
+    send(server_url, [2, player_key, []])  # とりあえず nil
     send(server_url, [3, player_key, [1, 1, 1, 1]])
     while True:
-        send(server_url, [4, player_key, []])
+        send(server_url, [4, player_key, []])  # とりあえず nil
 
 
 def send(server_url, python_list):
