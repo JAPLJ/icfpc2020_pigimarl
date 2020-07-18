@@ -17,7 +17,7 @@ def main():
 
 def send(server_url, python_list):
     print('Request:', python_list)
-    print('Modulated request:', enc(python_list))
+    # print('Modulated request:', enc(python_list))
 
     res = requests.post(server_url, data=enc(python_list))
 
@@ -27,7 +27,7 @@ def send(server_url, python_list):
         print('Response body:', res.text)
         exit(2)
 
-    print('Modulated server response:', res.text)
+    # print('Modulated server response:', res.text)
     print('Server response:', dec(res.text))
 
 
