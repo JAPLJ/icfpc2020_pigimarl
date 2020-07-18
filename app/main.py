@@ -1,8 +1,10 @@
-import requests
-import sys
+from final_tournament import *
 
 
 def main():
+    final_tournament()
+    exit(0)
+
     server_url = sys.argv[1]
     player_key = sys.argv[2]
     print('ServerUrl: %s; PlayerKey: %s' % (server_url, player_key))
