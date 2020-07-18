@@ -62,8 +62,10 @@ def annotate_numbers(a):
 
     for y in range(a.min_y, a.max_y + 1):
         for x in range(a.min_x, a.max_x + 1):
-            # 左上は欠けていないといけない
-            if a.get(y, x):
+            # .#
+            # #?
+            # 左上にこういう構造が必要
+            if not (not a.get(y, x) and a.get(y, x + 1) and a.get(y + 1, x)):
                 continue
 
             # 下方向にどれだけ白が続くか
@@ -81,6 +83,9 @@ def annotate_numbers(a):
 
             d = w  # 正方形の一辺の長さ
 
+            if not check_isolated(a, y, y + d, x, x + d):
+                continue
+
             num = 0
             for dy in range(d):
                 for dx in range(d):
@@ -90,6 +95,32 @@ def annotate_numbers(a):
             if h - w == 1:
                 num *= -1
 
-            annotations.append(Annotation(num, y, y + d, x, x + d))
+            annotations.append(Annotation(num, y, y + h, x, x + w))
+            erase_rectangle(a, y, y + h, x, x + w)
 
     return annotations
+
+
+def erase_rectangle(a, min_y, max_y, min_x, max_x):
+    for y in range(min_y, max_y + 1):
+        for x in range(min_x, max_x + 1):
+            a.set(y, x, False)
+
+
+def check_isolated(a, min_y, max_y, min_x, max_x):
+    """
+    [min_y, max_y] × [min_x, max_x] の小長方形の周り 1 ピクセルがすべて黒であるかチェック。
+    :param a:
+    :param min_y:
+    :param max_y:
+    :param min_x:
+    :param max_x:
+    :return:
+    """
+    for y in range(min_y - 1, max_y + 2):
+        if a.get(y, min_x - 1) or a.get(y, max_x + 1):
+            return False
+    for x in range(min_x - 1, max_x + 2):
+        if a.get(min_y - 1, x) or a.get(max_y + 1, x):
+            return False
+    return True

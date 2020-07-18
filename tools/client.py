@@ -1,6 +1,7 @@
 import requests
 import sys
 
+from annotate_picture import *
 from cons_list import *
 from galaxy_lazy import LazyGalaxy
 from mod_dem import *
@@ -81,7 +82,16 @@ def draw_pictures(pictures_path, pictures_cons_list):
     """
     pictures = cons_list_to_python_list(pictures_cons_list)
     plot_vectors_list = [cons_list_to_python_list(picture) for picture in pictures]
-    print('[Draw] Pictures:', plot_vectors_list)
+
+    # print('[Draw] Pictures:', plot_vectors_list)
+
+    for i, vectors in enumerate(plot_vectors_list, start=1):
+        annotations = annotate_picture(vectors)
+        if len(annotations) > 0:
+            print(f'[Draw] Picture #{i} has {len(annotations)} annotations:')
+            for anno in annotations:
+                print(f"val = {anno.val}, box = (({anno.min_x}, {anno.min_y}), ({anno.max_x}, {anno.max_y}))")
+
     multipul_draw(plot_vectors_list, output_dir=pictures_path)
 
 
