@@ -27,7 +27,8 @@ def send(server_url, python_list):
         print('Response body:', res.text)
         exit(2)
 
-    print('Server response:', res.text)
+    print('Modulated server response:', res.text)
+    print('Server response:', dec(res.text))
 
 
 if __name__ == '__main__':
