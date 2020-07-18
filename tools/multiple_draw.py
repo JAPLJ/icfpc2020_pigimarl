@@ -1,8 +1,9 @@
-from typing import List, Tuple, Optional
 from pathlib import Path
+from typing import List, Optional, Tuple
 
 import cv2
 import numpy as np
+
 from annotate_picture import Annotation
 
 DRAW_CORORS = [
@@ -22,7 +23,7 @@ def index_to_color_alpha(i: int) -> Tuple[Tuple[int, int, int], int]:
     if i == 0:
         return (255, 255, 255), 1
     else:
-        return DRAW_CORORS[(i-1) % len(DRAW_CORORS)], 0.7
+        return DRAW_CORORS[(i - 1) % len(DRAW_CORORS)], 0.7
 
 
 def draw_grid(img: np.ndarray, min_x, min_y, draw_size=10) -> np.ndarray:
@@ -33,8 +34,8 @@ def draw_grid(img: np.ndarray, min_x, min_y, draw_size=10) -> np.ndarray:
         (10, (100, 180, 100)),
         (50, (100, 100, 200))
     ]
-    origin_x = -min_x*draw_size
-    origin_y = -min_y*draw_size
+    origin_x = -min_x * draw_size
+    origin_y = -min_y * draw_size
     for grid_step, color in step_colors:
         step = draw_size * grid_step
         img[origin_y % step:img_y + origin_y:step, :, :] = color
@@ -48,7 +49,7 @@ def draw_grid(img: np.ndarray, min_x, min_y, draw_size=10) -> np.ndarray:
         x = origin_x
         cv2.putText(
             img,
-            str(int((origin_y - y)/draw_size)), (x, y),
+            str(int((origin_y - y) / draw_size)), (x, y),
             FONT,
             0.7,
             white,
@@ -59,7 +60,7 @@ def draw_grid(img: np.ndarray, min_x, min_y, draw_size=10) -> np.ndarray:
         y = origin_y
         cv2.putText(
             img,
-            str(int((x - origin_x)/draw_size)), (x, y),
+            str(int((x - origin_x) / draw_size)), (x, y),
             FONT,
             0.7,
             white,
@@ -70,12 +71,12 @@ def draw_grid(img: np.ndarray, min_x, min_y, draw_size=10) -> np.ndarray:
 
 
 def draw_annotation_list(
-    img: np.ndarray,
-    annotation_list: List[Annotation],
-    draw_size: int,
-    min_x: int,
-    min_y: int,
-    color: Tuple[int, int, int] = (0, 100, 0)
+        img: np.ndarray,
+        annotation_list: List[Annotation],
+        draw_size: int,
+        min_x: int,
+        min_y: int,
+        color: Tuple[int, int, int] = (0, 100, 0)
 ):
     tmp = np.zeros(img.shape, np.uint8)
     for annotation in annotation_list:
@@ -199,7 +200,7 @@ def multipul_draw(
             filename=filename,
             draw_color=draw_color,
             bg_color=bg_color,
-            annotation_list=annotation_lists[i]
+            annotation_list=None if annotation_lists is None else annotation_lists[i]
         )
 
     multilayer_draw(
