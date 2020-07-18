@@ -12,7 +12,8 @@ def draw(
         filename: str = 'draw.png',
         draw_color: Tuple[int, int, int] = (255, 255, 255),
         bg_color: Tuple[int, int, int] = (25, 25, 25),
-        offset: Tuple[int, int] = (156, 108)  # 大宇宙 galaxy
+        offset: Tuple[int, int] = (156, 108),  # 大宇宙 galaxy
+        show_grid: bool = True
 ) -> None:
     """
     output_dir配下にimage_size*draw_sizeの大きさの filename(png) を描画・保存する。
@@ -52,22 +53,49 @@ def draw(
             -1
         )
 
-    # draw grid
-    img_y, img_x = img.shape[:2]
-    step_colors = [
-        (1, (80, 80, 80)),
-        (5, (200, 100, 100)),
-        (10, (100, 180, 100)),
-        (50, (100, 100, 200))
-    ]
-    origin_x = offset[0] * draw_size
-    origin_y = offset[1] * draw_size
-    for grid_step, color in step_colors:
-        step = draw_size * grid_step
-        img[origin_y % step:img_y + origin_y:step, :, :] = color
-        img[:, origin_x % step:img_x + origin_x:step, :] = color
-    img[origin_y:origin_y + 2, :, :] = (255, 255, 255)
-    img[:, origin_x:origin_x + 2, :] = (255, 255, 255)
+    if show_grid:
+        # draw grid
+        img_y, img_x = img.shape[:2]
+        step_colors = [
+            (1, (80, 80, 80)),
+            (5, (200, 100, 100)),
+            (10, (100, 180, 100)),
+            (50, (100, 100, 200))
+        ]
+        origin_x = offset[0] * draw_size
+        origin_y = offset[1] * draw_size
+        for grid_step, color in step_colors:
+            step = draw_size * grid_step
+            img[origin_y % step:img_y + origin_y:step, :, :] = color
+            img[:, origin_x % step:img_x + origin_x:step, :] = color
+        white = (255, 255, 255)
+        img[origin_y:origin_y + 2, :, :] = white
+        img[:, origin_x:origin_x + 2, :] = white
+        # draw grid num
+        font = cv2.FONT_HERSHEY_SIMPLEX
+        text_step = 10 * draw_size
+        for y in range(origin_y % text_step, img_y, text_step):
+            x = origin_x
+            cv2.putText(
+                img,
+                str(int((origin_y - y)/draw_size)), (x, y),
+                font,
+                0.7,
+                white,
+                1,
+                cv2.LINE_AA
+            )
+        for x in range(origin_x % text_step, img_x, text_step):
+            y = origin_y
+            cv2.putText(
+                img,
+                str(int((x - origin_x)/draw_size)), (x, y),
+                font,
+                0.7,
+                white,
+                1,
+                cv2.LINE_AA
+            )
 
     cv2.imwrite(str(output_path), img)
 
