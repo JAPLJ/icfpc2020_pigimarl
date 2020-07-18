@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <link href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/@mdi/font@5.x/css/materialdesignicons.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.css" rel="stylesheet">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
+</head>
+<body>
+  <div id="app">
+    <v-app>
+        <v-main>
+        <v-container>
+            <vue-p5 v-on="this"
+            @mouseClicked="mouseClicked"
+            ></vue-p5>
+            <v-row>
+              <div>
+                <v-btn :disabled="calcWaiting" @click="onClickPost()">Post</v-btn>
+                  <v-text-field
+                   :disabled="calcWaiting"
+                    v-model="inputDataJson"
+                    name="input-7-4"
+                    label="Input Data"
+                  >
+                  </v-text-field>
+              </div>
+            <v-textarea
+                  :disabled="calcWaiting"
+              v-model="state"
+              name="input-7-4"
+              label="State"
+            >
+            </v-textarea> 
+            </v-row>
+        </v-container>
+        </v-main>
+    </v-app>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/vue@2.x/dist/vue.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script src="https://unpkg.com/vue-p5"></script>
+
+  
+  <script>
+    POST_ENDPOINT = "http://127.0.0.1:5000/interact"
+    
+    new Vue({
+      el: '#app',
+      vuetify: new Vuetify(),
+      data: {
+        calcWaiting: false,
+        multiple_draw: [
+          [],
+          [],
+          [],
+        ],
+        pixelHeight: 800,
+        pixelWidth: 1200,
+        colors: [
+          [255,255,255,1.0],
+          [255,200,0, 0.6],
+          [0,255,200, 0.6],
+          [255,200,0, 0.6],
+          [200,100,0, 0.6],
+          [0,200,100, 0.6],
+        ],
+        state: "(1, ((11, None), (0, (None, None))))",
+        inputData: [0,0]
+      },
+      computed:{
+        inputDataJson: {
+          get(){
+            return JSON.stringify(this.inputData)
+          },
+          set(json){
+            
+            try {
+              this.inputData = JSON.parse(json)
+            } catch (e) {
+              console.error(e)
+            }
+          }
+        },
+        dotSize() {
+          const xCnt =this.pixelWidth/this.gridWidth
+          const yCnt =this.pixelHeight/this.gridHeight
+          return xCnt > yCnt ? yCnt : xCnt;
+        },
+        gridHeight() {
+          return this.maxPMinP[0] - this.maxPMinP[2] + 1
+        },
+        gridWidth() {
+          return this.maxPMinP[1] - this.maxPMinP[3] + 1
+        },
+        maxPMinP() {
+          let max_x = -10000
+          let max_y = -10000
+          let min_x = 10000
+          let min_y = 10000
+            this.multiple_draw.forEach(vector_list => {
+              vector_list.forEach(vector => {
+                max_x = max_x > vector[0] ? max_x : vector[0]
+                max_y = max_y > vector[1] ? max_y : vector[1]
+                min_x = min_x < vector[0] ? min_x : vector[0]
+                min_y = min_y < vector[1] ? min_y : vector[1]
+              } )
+            });
+          return [max_x,max_y, min_x, min_y]
+        }
+      },
+      methods: {
+        async onClickPost(){
+          this.calcWaiting = true
+          axios.post(POST_ENDPOINT, {
+            vector: this.inputData,
+            state: this.state
+          }).then((res)=>{
+            this.multiple_draw = res.data.multiple_draw
+            this.state = res.data.state
+            this.calcWaiting = false
+          })
+        },
+        setup(sketch) {
+          sketch.resizeCanvas(this.pixelWidth, this.pixelHeight);
+          sketch.noStroke();
+        },
+        vectorToPixelPoint( [x,y]) {
+          return [ (x-this.maxPMinP[2]) *this.dotSize, (y-this.maxPMinP[3]) *this.dotSize ]
+        },
+        pixelPointToVector([x,y]) {
+          return [ Math.floor(x /this.dotSize) + this.maxPMinP[2], Math.floor(y/this.dotSize) + this.maxPMinP[3]]
+        },
+        draw(sketch) {
+            sketch.background((25,25,25));
+            this.multiple_draw.forEach( (vector_list,i) => {
+              sketch.fill(`rgba(${this.colors[i].join(',')})`)
+              vector_list.forEach(vector => {
+                [x,y] = this.vectorToPixelPoint(vector)
+                sketch.rect(x, y, this.dotSize,this.dotSize);
+              } )
+            });
+        },
+        mouseClicked(sk) {
+
+          if ( sk.mouseX >= 0 && 
+          sk.mouseX < this.pixelWidth && 
+          sk.mouseY >= 0 && 
+          sk.mouseY < this.pixelHeight ) {
+            const vec = this.pixelPointToVector([sk.mouseX, sk.mouseY]);
+            console.log(vec);
+            this.inputData = vec
+          }
+        },
+        sketchEvent(sketch) {
+          const clicks = [];
+
+          sk.mouseClicked = () => {
+            // save clicks to array
+          }
+
+          sk.draw = () => {
+            // draw a circle around each clicked position
+            clicks.forEach(({ x, y }) => {
+              sk.ellipse(x, y, 10, 10);
+            });
+          }
+        },
+      },
+    })
+  </script>
+</body>
+</html>

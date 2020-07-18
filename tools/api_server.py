@@ -13,11 +13,13 @@ url -X POST -H "Content-Type: application/json" -d '{"state": "None", "vector":[
 import json
 
 from flask import Flask, request
+from flask_cors import CORS
 
 import deep_tuple
 from client import *
 
 api = Flask(__name__)
+CORS(api)
 
 galaxy_path = sys.argv[1]
 server_url = sys.argv[2]
