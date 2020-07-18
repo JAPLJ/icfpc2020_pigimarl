@@ -33,7 +33,7 @@ def python_list_to_cons_list(python_list):
         if len(python_list) == 0:
             return None
         else:
-            return python_list[0], python_list[1:]
+            return python_list[0], python_list_to_cons_list(python_list[1:])
     else:
         print('Error! Not a Python list:', python_list)
         exit(2)
