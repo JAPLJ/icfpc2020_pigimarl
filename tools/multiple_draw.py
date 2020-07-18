@@ -1,9 +1,53 @@
 from pathlib import Path
-from typing import List, Tuple
+from typing import List, Tuple, Optional
 
 import cv2
 import numpy as np
 
+
+def draw_grid(img: np.ndarray, min_x, min_y, draw_size=10) -> np.ndarray:
+    img_y, img_x = img.shape[:2]
+    step_colors = [
+        (1, (80, 80, 80)),
+        (5, (200, 100, 100)),
+        (10, (100, 180, 100)),
+        (50, (100, 100, 200))
+    ]
+    origin_x = -min_x*draw_size
+    origin_y = -min_y*draw_size
+    for grid_step, color in step_colors:
+        step = draw_size * grid_step
+        img[origin_y % step:img_y + origin_y:step, :, :] = color
+        img[:, origin_x % step:img_x + origin_x:step, :] = color
+    white = (255, 255, 255)
+    img[origin_y:origin_y + 2, :, :] = white
+    img[:, origin_x:origin_x + 2, :] = white
+    # draw grid num
+    font = cv2.FONT_HERSHEY_SIMPLEX
+    text_step = 10 * draw_size
+    for y in range(origin_y % text_step, img_y, text_step):
+        x = origin_x
+        cv2.putText(
+            img,
+            str(int((origin_y - y)/draw_size)), (x, y),
+            font,
+            0.7,
+            white,
+            1,
+            cv2.LINE_AA
+        )
+    for x in range(origin_x % text_step, img_x, text_step):
+        y = origin_y
+        cv2.putText(
+            img,
+            str(int((x - origin_x)/draw_size)), (x, y),
+            font,
+            0.7,
+            white,
+            1,
+            cv2.LINE_AA
+        )
+    return img
 
 def draw(
         plot_vectors: List[Tuple[int, int]],
@@ -12,7 +56,7 @@ def draw(
         filename: str = 'draw.png',
         draw_color: Tuple[int, int, int] = (255, 255, 255),
         bg_color: Tuple[int, int, int] = (25, 25, 25),
-        show_grid: bool = True
+        show_grid: bool = True,
 ) -> None:
     """
     output_dir配下にimage_size*draw_sizeの大きさの filename(png) を描画・保存する。
@@ -53,50 +97,15 @@ def draw(
         )
 
     if show_grid:
-        # draw grid
-        img_y, img_x = img.shape[:2]
-        step_colors = [
-            (1, (80, 80, 80)),
-            (5, (200, 100, 100)),
-            (10, (100, 180, 100)),
-            (50, (100, 100, 200))
-        ]
-        origin_x = -min_x*draw_size
-        origin_y = -min_y*draw_size
-        for grid_step, color in step_colors:
-            step = draw_size * grid_step
-            img[origin_y % step:img_y + origin_y:step, :, :] = color
-            img[:, origin_x % step:img_x + origin_x:step, :] = color
-        white = (255, 255, 255)
-        img[origin_y:origin_y + 2, :, :] = white
-        img[:, origin_x:origin_x + 2, :] = white
-        # draw grid num
-        font = cv2.FONT_HERSHEY_SIMPLEX
-        text_step = 10 * draw_size
-        for y in range(origin_y % text_step, img_y, text_step):
-            x = origin_x
-            cv2.putText(
-                img,
-                str(int((origin_y - y)/draw_size)), (x, y),
-                font,
-                0.7,
-                white,
-                1,
-                cv2.LINE_AA
-            )
-        for x in range(origin_x % text_step, img_x, text_step):
-            y = origin_y
-            cv2.putText(
-                img,
-                str(int((x - origin_x)/draw_size)), (x, y),
-                font,
-                0.7,
-                white,
-                1,
-                cv2.LINE_AA
-            )
+        draw_grid(
+            img=img,
+            min_x=min_x,
+            min_y=min_y,
+            draw_size=draw_size
+        )
 
     cv2.imwrite(str(output_path), img)
+    return img
 
 
 def multipul_draw(
@@ -123,3 +132,77 @@ def multipul_draw(
             draw_color=draw_color,
             bg_color=bg_color,
         )
+
+    multilayer_draw(plot_vectors_list=plot_vectors_list, output_dir=output_dir)
+
+
+def multilayer_draw(
+        plot_vectors_list: List[List[Tuple[int, int]]],
+        draw_size: int = 10,
+        output_dir: str = '',
+        filename: str = 'draw_layered.png',
+        draw_color: Tuple[int, int, int] = (255, 255, 255),
+        bg_color: Tuple[int, int, int] = (25, 25, 25),
+        show_grid: bool = True,
+        reversed_layer_draw: bool = True,
+) -> None:
+    min_x = 10000
+    max_x = -10000
+    min_y = 10000
+    max_y = -10000
+    for plot_vectors in plot_vectors_list:
+        for x, y in plot_vectors:
+            min_x = min(min_x, x)
+            max_x = max(max_x, x)
+            min_y = min(min_y, y)
+            max_y = max(max_y, y)
+
+    width = max(1, max_x - min_x + 1)
+    height = max(1, max_y - min_y + 1)
+
+    output_path = Path(output_dir) / filename
+    img = np.full(
+        (
+            height * draw_size,
+            width * draw_size,
+            3
+        ),
+        bg_color,
+        dtype=np.uint8
+    )
+
+    draw_colors = [
+        (80, 200, 200),
+        (200, 80, 200),
+        (80, 200, 200),
+        (200, 80, 80),
+        (80, 200, 80),
+        (80, 80, 200),
+    ]
+    if reversed_layer_draw:
+        plot_vectors_list = list(reversed(plot_vectors_list))
+    for i in range(len(plot_vectors_list)):
+        plot_vectors = plot_vectors_list[i]
+        if i == len(plot_vectors_list)-1:
+            draw_color = (255, 255, 255)
+        else:
+            draw_color = draw_colors[i]
+
+        for vector in plot_vectors:
+            x = (vector[0] - min_x) * draw_size
+            y = (vector[1] - min_y) * draw_size
+            cv2.rectangle(
+                img,
+                (x, y),
+                (x + draw_size - 1, y + draw_size - 1),
+                draw_color,
+                -1
+            )
+
+    draw_grid(
+        img=img,
+        min_x=min_x,
+        min_y=min_y,
+        draw_size=draw_size
+    )
+    cv2.imwrite(str(output_path), img)
