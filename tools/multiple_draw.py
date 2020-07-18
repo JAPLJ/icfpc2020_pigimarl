@@ -4,6 +4,24 @@ from typing import List, Tuple, Optional
 import cv2
 import numpy as np
 
+draw_colors = [
+    (80, 200, 200),
+    (200, 80, 200),
+    (200, 200, 80),
+    (80, 80, 200),
+    (80, 200, 80),
+    (200, 80, 80),
+    (150, 80, 200),
+    (80, 200, 150),
+]
+
+
+def index_to_color_alpha(i: int) -> Tuple[Tuple[int, int, int], int]:
+    if i == 0:
+        return (255, 255, 255), 1
+    else:
+        return draw_colors[(i-1) % len(draw_colors)], 0.7
+
 
 def draw_grid(img: np.ndarray, min_x, min_y, draw_size=10) -> np.ndarray:
     img_y, img_x = img.shape[:2]
@@ -48,6 +66,7 @@ def draw_grid(img: np.ndarray, min_x, min_y, draw_size=10) -> np.ndarray:
             cv2.LINE_AA
         )
     return img
+
 
 def draw(
         plot_vectors: List[Tuple[int, int]],
@@ -122,6 +141,7 @@ def multipul_draw(
     filenameは <filename_suffix>_<i>.png で連番
     """
     for i in range(len(plot_vectors_list)):
+        draw_color, _ = index_to_color_alpha(i)
         plot_vectors = plot_vectors_list[i]
         filename = f'{filename_suffix}_{i}.png'
         draw(
@@ -144,7 +164,6 @@ def multilayer_draw(
         draw_color: Tuple[int, int, int] = (255, 255, 255),
         bg_color: Tuple[int, int, int] = (25, 25, 25),
         show_grid: bool = True,
-        reversed_layer_draw: bool = True,
 ) -> None:
     min_x = 10000
     max_x = -10000
@@ -171,33 +190,23 @@ def multilayer_draw(
         dtype=np.uint8
     )
 
-    draw_colors = [
-        (80, 200, 200, 0.5),
-        (200, 80, 200, 0.5),
-        (200, 200, 80, 0.5),
-        (200, 80, 80, 0.5),
-        (80, 200, 80, 0.5),
-        (80, 80, 200, 0.5),
-    ]
-    if reversed_layer_draw:
-        plot_vectors_list = list(reversed(plot_vectors_list))
+    # 一番最後に最初の画像を
     for i in range(len(plot_vectors_list)):
         plot_vectors = plot_vectors_list[i]
-        if i == len(plot_vectors_list)-1:
-            draw_color = (255, 255, 255)
-        else:
-            draw_color = draw_colors[i]
+        draw_color, alpha = index_to_color_alpha(i)
 
+        tmp = np.zeros(img.shape, np.uint8)
         for vector in plot_vectors:
             x = (vector[0] - min_x) * draw_size
             y = (vector[1] - min_y) * draw_size
             cv2.rectangle(
-                img,
+                tmp,
                 (x, y),
                 (x + draw_size - 1, y + draw_size - 1),
                 draw_color,
-                -1
+                cv2.FILLED
             )
+        img = cv2.addWeighted(img, 1, tmp, alpha, 1)
 
     draw_grid(
         img=img,
