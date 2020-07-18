@@ -30,6 +30,7 @@
             <v-list-item two-line :class="miniVariant && 'px-0'">
               <v-list-item-content>
                 <v-list-item-title>Log</v-list-item-title>
+                <v-checkbox v-model="updateUrl" label="UPDATE URL"></v-checkbox>
               </v-list-item-content>
             </v-list-item>
             <v-divider></v-divider>
@@ -37,12 +38,14 @@
               <template v-slot:default>
                 <thead>
                   <tr>
+                    <th class="text-left">No</th>
                     <th class="text-left">State</th>
                     <th class="text-left">Input Data</th>
                   </tr>
                 </thead>
                 <tbody>
                   <tr v-for="(data, i) in log" :key="i">
+                    <td>{{ i }}</td>
                     <td>{{ data.state}}</td>
                     <td>{{ data.input }}</td>
                   </tr>
@@ -89,13 +92,24 @@
   
   <script>
     POST_ENDPOINT = "http://127.0.0.1:5000/interact"
+    INPUT_QUERY = 'vector'
+    STATE_QUERY = 'state'
 
-    initState = "(1, ((11, None), (0, (None, None))))"
+    let initState = "(1, ((11, None), (0, (None, None))))"
+    let url = new URL(window.location);
+    if ( url.searchParams.has(STATE_QUERY)) {
+      initState = url.searchParams.get(STATE_QUERY)
+    }
+    initInputData = [0,0]
+    if ( url.searchParams.has(INPUT_QUERY)) {
+      initInputData = JSON.parse( url.searchParams.get(INPUT_QUERY))
+    }
     
     new Vue({
       el: '#app',
       vuetify: new Vuetify(),
       data: {
+        updateUrl: false,
         clickPosting: true,
         log: [],
         calcWaiting: false,
@@ -117,6 +131,9 @@
         ],
         state: initState,
         inputData: [0,0]
+      },
+      mounted(){
+          this.onClickPost()
       },
       computed:{
         inputDataJson: {
@@ -174,6 +191,12 @@
             this.multiple_draw = res.data.multiple_draw
             this.state = res.data.state
             this.calcWaiting = false
+            if(this.updateUrl){
+              let url = new URL(window.location); 
+              url.searchParams.set(STATE_QUERY, this.state)
+              url.searchParams.set(INPUT_QUERY, JSON.stringify( this.inputData))
+              history.replaceState('','', url);
+            }
           })
         },
         setup(sketch) {
