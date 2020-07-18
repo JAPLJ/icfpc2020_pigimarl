@@ -21,8 +21,8 @@ def draw(
     output_path = Path(output_dir) / filename
     img = np.full(
         (
-            imagemap_size[1] * draw_size + draw_size,
-            imagemap_size[0] * draw_size + draw_size,
+            imagemap_size[1] * draw_size,
+            imagemap_size[0] * draw_size,
             3
         ),
         bg_color,
@@ -34,7 +34,7 @@ def draw(
         cv2.rectangle(
             img,
             (x, y),
-            (x + draw_size, y + draw_size),
+            (x + draw_size - 1, y + draw_size - 1),
             draw_color,
             -1
         )
