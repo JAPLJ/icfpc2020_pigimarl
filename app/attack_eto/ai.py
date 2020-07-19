@@ -23,14 +23,16 @@ class AI:
                 laser_power = ship.params.laser_power  # フルバースト
                 commands[ship.id] = [{"command": "laser", "power": laser_power, "x": target_x, "y":target_y}]
 
+        # 一番IDが小さい敵を撃つ。有効なダメージじゃなかったらやめる
         for ship in state.my_ships:
             laser_power = min(ship.params.laser_power, TEMP_LIMIT - ship.temp)
+            expected_damage = laser_damage(ship.x, ship.y, target_x, target_y, laser_power)
+            if expected_damage <= enemy_ship.params.cooling_rate: continue
             commands[ship.id] = [{"command": "laser", "power": laser_power, "x": target_x, "y":target_y}]
 
         return commands
 
     def set_specs(self, limit: int, side: int) -> ShipParameter:
-        # TODO まともにする
         energy = 30
         laser_power = 64
         cooling_rate = 0
