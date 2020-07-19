@@ -27,4 +27,4 @@ class TestAI:
         return res
 
     def set_specs(self, limit, side):
-        return ShipParameter(limit - (4 * 0 + 12 * 8 + 1 * 2), 64, 8, 1)
+        return ShipParameter(limit - (4 * 0 + 12 * 8 + 1 * 2), 0, 8, 1)
