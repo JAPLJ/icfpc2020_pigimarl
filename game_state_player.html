@@ -23,10 +23,11 @@
           >
             <v-list-item two-line :class="miniVariant && 'px-0'">
               <v-list-item-content>
-                <v-list-item-title>Game State</v-list-item-title>
-                <v-list-item-sub-title>
-                  Side: {{ currentGameState.my_side === 1 ? '攻' : '守' }}: Turn {{ currentGameState.current_turn }}
-                </v-list-item-title>
+                <v-list-item-title>Game State game stage {{currentGameState.game_stage}}</v-list-item-title>
+                  Side: {{ currentGameState.my_side === 1 ? '攻' : '守' }} <br>
+                  Planet Radius: {{ currentGameState.planet_radius }} <br>
+                  Gravity Radius: {{ currentGameState.gravity_radius }} <br>
+                  Turn {{ currentGameState.current_turn }} / {{ gameStateList.length }}
               </v-list-item-content>
             </v-list-item>
             <v-divider></v-divider>
@@ -229,6 +230,8 @@
         gameStateList: [
           {
             game_stage: 1,
+            planet_radius: 10,
+            gravity_radius: 20,
             current_turn: 1,
             my_syde: 1,
             my_ships: [
@@ -271,6 +274,8 @@
           {
             game_stage: 1,
             current_turn: 2,
+            planet_radius: 10,
+            gravity_radius: 20,
             my_syde: 1,
             my_ships: [
               {
