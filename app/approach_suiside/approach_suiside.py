@@ -16,10 +16,6 @@ def create_accel_command(x: int, y: int) -> Dict:
     return {'command': 'accel', 'x': x, 'y': y}
 
 
-def create_laser_command(x: int, y: int, power: int) -> Dict:
-    return {'command': 'laser', 'x': x, 'y': y, 'power': power}
-
-
 def create_suiside_command() -> Dict:
     return {'command': 'suiside'}
 
