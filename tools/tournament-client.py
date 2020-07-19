@@ -6,6 +6,8 @@ from mod_dem import *
 from common_interface import *
 from conversion import *
 
+API_KEY = 'c16bab7da69d411da59ce8227e5d9034'
+
 def run(server_url, player_key, solver):
     """
     ゲームを一回分実行
@@ -49,7 +51,7 @@ def send(server_url, list_req):
     print('[Send] req:', list_req)
     cons_req = python_list_to_cons_list_recurse(list_req)
     mod_req = enc_from_cons_obj(cons_req)
-    http_res = requests.post(server_url + '/aliens/send', data=mod_req)
+    http_res = requests.post(f'{server_url}/aliens/send?apiKey={API_KEY}', data=mod_req)
     if http_res.status_code != 200:
         print('[Send] Unexpected server response:')
         print('[Send] HTTP code:', http_res.status_code)
