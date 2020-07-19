@@ -122,7 +122,7 @@ def main():
     attacker = AttackerSolver()
     defender = DefenderSolver()
 
-    run(server_url, player_key, attacker, defender)
+    run(server_url, player_key, defender, defender)
 
 
 if __name__ == '__main__':
