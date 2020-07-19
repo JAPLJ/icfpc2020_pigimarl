@@ -30,9 +30,9 @@ def execute(
         p2_name, p2_command, p2_key,
         server_url):
     with open(os.path.join('log', f'{p1_name}.log'), "w") as f:
-        p = Popen([p1_command, server_url, p1_key], stdout=f, stderr=f)
+        p = Popen([p1_command, server_url, p1_key], stdout=f)
     with open(os.path.join('log', f'{p2_name}.log'), "w") as g:
-        q = Popen([p2_command, server_url, p2_key], stdout=g, stderr=g)
+        q = Popen([p2_command, server_url, p2_key], stdout=g)
     p.wait()
     q.wait()
 
