@@ -55,3 +55,17 @@ def python_list_to_cons_list(python_list):
     else:
         print('Error! Not a Python list:', python_list)
         exit(2)
+
+def python_list_to_cons_list_recurse(python_list):
+    if type(python_list) is list:
+        if len(python_list) == 0:
+            return None
+        else:
+            head = python_list_to_cons_list_recurse(python_list[0])
+            tail = python_list_to_cons_list_recurse(python_list[1:])
+            return (head, tail)
+    elif type(python_list) is int:
+        return python_list
+    else:
+        print('Error! Not a Python list:', python_list)
+        exit(2)
