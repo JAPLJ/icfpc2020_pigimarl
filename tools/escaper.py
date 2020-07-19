@@ -21,7 +21,7 @@ class Escaper:
             if (ax, ay) == (0, 0):
                 continue
             moves = [(ax, ay)]
-            if utils.gravity_check(state.planet_radius, state.gravity_radius,
+            if utils.gravity_check(planet_radius, gravity_radius,
                                    ship.x, ship.y, ship.vx, ship.vy, moves, self.CHECK_TURN):
                 return (ax, ay)
         return stop(ship.x, ship.y, ship.vx, ship.vy)
