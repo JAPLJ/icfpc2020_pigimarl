@@ -15,6 +15,8 @@ class TestAI:
         res = {}
 
         for ship in state.my_ships:
+            # print(f'id={ship.id}, x={ship.x}, y={ship.y}')
+
             if state.my_side == Side.ATTACK:
                 tx = state.gravity_radius
                 ty = state.gravity_radius

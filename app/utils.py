@@ -105,7 +105,7 @@ def move_to_target(gravity_r, planet_r, sx, sy, vx, vy, tx, ty):
     if (sx, sy) == (tx, ty):  # 目標の座標に到達したら静止する
         return -(vx + gx), -(vy + gy)
 
-    dist = np.fill((gr * 2 + 1, gr * 2 + 1), 10 ** 9)
+    dist = np.full((gr * 2 + 1, gr * 2 + 1), 10 ** 9)
     dist[tx + gr][ty + gr] = 0
     q = deque()
     q.append((tx, ty))
