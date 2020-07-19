@@ -117,11 +117,11 @@ def get_random_accel(planet_r, gravity_r, x0, y0, vx0, vy0):
     """
     (x, y), (vx, vy)時に加速しても安全な方向をランダムに選ぶ
     全部ダメなら適当に返す
-    安全かどうかは5回くらい中心と端の近い方から離れる動きをして判断する
+    安全かどうかは20回くらい中心と端の近い方から離れる動きをして判断する
     """
     axy = list(zip(DX, DY))
     np.random.shuffle(axy)
-    MAX_STEPS = 5
+    MAX_STEPS = 20
 
     def _is_safe(planet_r, gravity_r, x, y, vx, vy, max_steps):
         if not is_safe_zone(planet_r, gravity_r, x, y):
