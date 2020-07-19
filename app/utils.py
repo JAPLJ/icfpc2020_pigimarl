@@ -1,3 +1,5 @@
+import numpy as np
+
 def sign(val):
     if val > 0:
         return 1
@@ -101,3 +103,46 @@ def stop(x, y, vx, vy):
             return 0
     gx, gy = calc_gravity(x, y)
     return (_stop(vx, gx), _stop(vy, gy))
+
+
+def is_safe_zone(planet_r, gravity_r, x, y):
+    """
+    (x, y)が安全な場所ならTrue
+    """
+    mx = max(abs(x), abs(y))
+    return planet_r < mx < gravity_r
+
+
+def get_random_accel(planet_r, gravity_r, x0, y0, vx0, vy0):
+    """
+    (x, y), (vx, vy)時に加速しても安全な方向をランダムに選ぶ
+    全部ダメなら適当に返す
+    安全かどうかは5回くらい中心と端の近い方から離れる動きをして判断する
+    """
+    axy = list(zip(DX, DY))
+    np.random.shuffle(axy)
+    MAX_STEPS = 5
+
+    def _is_safe(planet_r, gravity_r, x, y, vx, vy, max_steps):
+        if not is_safe_zone(planet_r, gravity_r, x, y):
+            return False
+
+        for i in range(max_steps):
+            dx_planet = abs(x)-planet_r
+            dx_gravity = gravity_r-abs(x)
+            dy_planet = abs(y)-planet_r
+            dy_gravity = gravity_r-abs(y)
+            vx += 1 if dx_planet < dx_gravity else -1
+            vy += 1 if dy_planet < dy_gravity else -1
+            next_pos(x, y, vx, vy)
+            if not is_safe_zone(planet_r, gravity_r, x, y):
+                return False
+
+    for ax, ay in axy:
+        x, y, vx, vy = x0, y0, vx0, vy0
+        vx += ax
+        vx += ax
+        next_pos(x, y, vx, vy)
+        if _is_safe(planet_r, gravity_r, x, y, vx, vy, MAX_STEPS):
+            return ax, ay
+    return axy[0]

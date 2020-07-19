@@ -2,21 +2,21 @@ import sys
 sys.path.append('tools')
 from typing import Dict, List
 import math
+import numpy as np
 from tournament_client import run
 from common_interface import GameStage, ShipParameter, Side
 from ai_interface import Ship, State
-from utils import go_into_orbit
+from utils import go_into_orbit, get_random_accel
 import dataclasses
 
 
 @dataclasses.dataclass
 class ShipState:
     age: int
-    moved: bool
 
 
 class BunretsuWalk:
-    def __init__(self, cooling_rate=8*2, soul=8):
+    def __init__(self, cooling_rate=8*4, soul=8):
         self.cooling_rate = cooling_rate
         self.soul = soul
         self.ship_states = {}
@@ -30,7 +30,7 @@ class BunretsuWalk:
             params = ship.params
 
             if ship.id not in self.ship_states:
-                self.ship_states[ship.id] = ShipState(0, False)
+                self.ship_states[ship.id] = ShipState(0)
 
             ship_state = self.ship_states[ship.id]
 
@@ -43,22 +43,30 @@ class BunretsuWalk:
                     'p4': 1,
                 }
                 commands.append(command)
-            elif ship_state.age > 3 and not ship_state.moved:
-                print('begin calc', file=sys.stderr)
+            elif 3 <= ship_state.age < 6:
                 moves = go_into_orbit(
-                    state.planet_radius, 
+                    state.planet_radius,
                     ship.x, ship.y, ship.vx, ship.vy
                 )
-                print('end calc', file=sys.stderr)
-                if len(moves) == 0:
-                    ship_state.moved = True
-                else:
+                if len(moves) > 0:
                     command = {
                         'command': 'accel',
                         'x': moves[0][0],
                         'y': moves[0][1],
                     }
                     commands.append(command)
+            elif np.random.randint(0, 2):
+                axy = get_random_accel(
+                    state.planet_radius, state.gravity_radius,
+                    ship.x, ship.y, ship.vx, ship.vy
+                )
+                command = {
+                    'command': 'accel',
+                    'x': axy[0],
+                    'y': axy[1],
+                }
+                commands.append(command)
+
             ship_state.age += 1
             all_commands[ship.id] = commands
             print(all_commands, file=sys.stderr)
@@ -67,6 +75,7 @@ class BunretsuWalk:
 
     def set_specs(self, limit: int, side: int) -> ShipParameter:
         energy = limit - 12*self.cooling_rate - 2*self.soul
+        print(energy, file=sys.stderr)
         return ShipParameter(energy, 0, self.cooling_rate, self.soul)
 
 
