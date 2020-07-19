@@ -127,4 +127,4 @@ def move_to_target(planet_r, x, y, vx, vy, tx, ty):
         gx, gy = calc_gravity(x, y)
         return -vx - gx, -vy - gy
     else:
-        walk_on_square_orbit(planet_r, x, y, vx, vy, max(tx, ty))
+        return walk_on_square_orbit(planet_r, x, y, vx, vy, max(tx, ty))
