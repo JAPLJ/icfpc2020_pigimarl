@@ -21,11 +21,13 @@ def game_response_to_state(resp):
 
     # game_state = [ turn, gravity, ships ]
     current_turn = game_state[0]
-    (planet_radius, gravity_radius) = game_state[1]
+    if len(game_state[1]) > 0:
+        (planet_radius, gravity_radius) = game_state[1]
+    else:
+        (planet_radius, gravity_radius) = (None, None)
     ships = game_state[2]
 
-    # ships = [ def_ships, atk_ships ]
-    (def_ships, atk_ships) = convert_ships(ships)
+    (atk_ships, def_ships) = convert_ships(ships)
 
     return State(game_stage=game_stage,
                  planet_radius=planet_radius,
