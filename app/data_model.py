@@ -17,7 +17,7 @@ class State:
     current_turn: int
     my_side: int
     my_ships: List[Ship]
-    enemy_shps: List[Ship]
+    enemy_ships: List[Ship]
 
 
 if __name__ == '__main__':
