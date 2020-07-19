@@ -10,7 +10,7 @@ from conversion import *
 API_KEY = 'c16bab7da69d411da59ce8227e5d9034'
 TURN_MAX = 256
 
-def run(server_url, player_key, attacker_solver, defender_solver=None):
+def run(server_url, player_key, attacker_solver, defender_solver=None, json_log_path=None):
     """
     ゲームを一回分実行
     sideに応じてsolverを使い分ける
@@ -20,6 +20,9 @@ def run(server_url, player_key, attacker_solver, defender_solver=None):
         set_specs func(limit: int, side: int) -> ShipParameter
 
     """
+    json_logging = json_log_path is not None
+    json_logs = []
+
     print('[RUNNER] join game')
     req_join = make_req_join(player_key)
     (my_side, limit) = send(server_url, req_join)
@@ -33,6 +36,8 @@ def run(server_url, player_key, attacker_solver, defender_solver=None):
     print('[RUNNER] start game, parameter:', ship_parameter.list())
     req_start = make_req_start(player_key, ship_parameter)
     state = send(server_url, req_start)
+    if json_logging:
+        json_logs.append(state.to_json())
 
     while True:
         print('[RUNNER] current_turn:', state.current_turn)
@@ -40,9 +45,15 @@ def run(server_url, player_key, attacker_solver, defender_solver=None):
         print('[RUNNER] send commands:', commands)
         req_commands = make_req_commands(player_key, commands)
         state = send(server_url, req_commands)
+        if json_logging:
+            json_logs.append(state.to_json())
 
         if state.game_stage == GameStage.FINISHED:
             break
+    
+    if json_logging:
+        with open(json_log_path, 'w') as f:
+            f.write(f'[{",".join(json_logs)}]')
 
     print('[RUNNER] game finished')
     winner = Side.DEFENSE if state.current_turn == TURN_MAX else Side.ATTACK
@@ -98,6 +109,7 @@ def make_req_commands(player_key, commands):
 def main():
     server_url = sys.argv[1]
     player_key = int(sys.argv[2])
+    json_log_path = None if len(sys.argv) < 4 else sys.argv[3]
 
     # sys.setrecursionlimit(1000000)
 
@@ -124,7 +136,7 @@ def main():
     attacker = SolverStasis()
     defender = SolverStasis()
 
-    run(server_url, player_key, defender, defender)
+    run(server_url, player_key, attacker, defender, json_log_path=json_log_path)
 
 
 if __name__ == '__main__':
