@@ -45,7 +45,7 @@ def gravity_check(planet_r, gravity_r, x0, y0, vx0, vy0, moves):
     for i in range(256):
         if i < len(moves):
             vx, vy = vx + moves[i][0], vy + moves[i][1]
-        (x, y, vx, vy) = next_pos(planet_r, gravity_r, x, y, vx, vy)
+        (x, y, vx, vy) = next_pos(planet_r, x, y, vx, vy)
         if max(abs(x), abs(y)) <= planet_r or max(abs(x), abs(y)) > gravity_r:
             return False
     return True

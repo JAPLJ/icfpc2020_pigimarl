@@ -50,8 +50,10 @@ def run(server_url, player_key, attacker_solver, defender_solver=None, json_log_
             break
     
     if json_logging:
+        import json
         with open(json_log_path, 'w') as f:
-            f.write(f'[{",".join(json_logs)}]')
+            f.write(json.dumps(json_logs))
+            # f.write(f'[{",".join(json_logs)}]')
 
     print('[RUNNER] game finished')
 
@@ -109,10 +111,12 @@ def main():
 
     # sys.setrecursionlimit(1000000)
     import rotating_ai
+    import drop_the_bomb
 
-    solver = rotating_ai.RotatingAI()
+    rotating = rotating_ai.RotatingAI()
+    dtb = drop_the_bomb.DropTheBomb()
 
-    run(server_url, player_key, solver, json_log_path=json_log_path)
+    run(server_url, player_key, dtb, json_log_path=json_log_path)
 
 
 if __name__ == '__main__':

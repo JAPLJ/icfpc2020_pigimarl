@@ -2,36 +2,8 @@ from common_interface import *
 from ai_interface import *
 
 import sys
-sys.path.append('../app/')
+sys.path.append('app/')
 from utils import *
-
-
-DX = [-1, -1, -1, 0, 1, 1, 1, 0]
-DY = [-1, 0, 1, 1, 1, 0, -1, -1]
-
-
-def gravity_check(planet_r, gravity_r, x0, y0, vx0, vy0, moves):
-    x, y = x0, y0
-    vx, vy = vx0, vy0
-    for i in range(256):
-        if i < len(moves):
-            vx, vy = vx + moves[i][0], vy + moves[i][1]
-        (x, y, vx, vy) = next_pos(planet_r, gravity_r, x, y, vx, vy)
-        if max(abs(x), abs(y)) <= planet_r or max(abs(x), abs(y)) > gravity_r:
-            return False
-    return True
-
-
-def go_into_orbit(planet_r, gravity_r, x0, y0, vx0, vy0):
-    ln = 1
-    while True:
-        for d in range(8):
-            dx, dy = DX[d], DY[d]
-            ms = [(dx, dy) for i in range(ln)]
-            if gravity_check(planet_r, gravity_r, x0, y0, vx0, vy0, ms):
-                print(ms)
-                return ms
-        ln += 1
 
 
 class RotatingAI:
@@ -64,7 +36,7 @@ class RotatingAI:
                     # 死んでるし
                     continue
                 
-                (nx, ny, _, _) = next_pos(state.planet_radius, state.gravity_radius, eship.x, eship.y, eship.vx, eship.vy)
+                (nx, ny, _, _) = next_pos(state.planet_radius, eship.x, eship.y, eship.vx, eship.vy)
                 max_lp = min(ship.params.laser_power, 64 - ship.temp)
                 ldmg = laser_damage(ship.x, ship.y, nx, ny, max_lp)
                 if ldmg > max_dmg:
@@ -77,4 +49,5 @@ class RotatingAI:
 
 
     def set_specs(self, limit, side):
+        souls = 100
         return ShipParameter(limit - (64*4 + 12*10 + 1*2), 64, 10, 1)
