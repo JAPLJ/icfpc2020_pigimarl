@@ -37,6 +37,8 @@ def interact():
     state = deep_tuple.read(state_str)
     vector = tuple(vector_list)
 
+    sends = []
+
     while True:
         print('[Galaxy] Input state:', state)
         print('[Galaxy] Input vector:', vector)
@@ -53,6 +55,11 @@ def interact():
         vector = send(server_url, data)
         print('[Send] Response vector:', vector)
 
+        sends.append({
+            'request': cons_list_to_python_list_recurse(data),
+            'response': cons_list_to_python_list_recurse(vector)}
+        )
+
     pictures = [
         [
             list(t)
@@ -61,7 +68,7 @@ def interact():
         for cl in cons_list_to_python_list(data)
     ]
 
-    res = {'state': str(state), 'multiple_draw': pictures}
+    res = {'state': str(state), 'multiple_draw': pictures, 'sends': sends}
 
     return json.dumps(res)
 
