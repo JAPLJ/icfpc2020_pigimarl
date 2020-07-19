@@ -75,7 +75,7 @@ def make_req_start(player_key, ship_parameter):
 
 def make_req_commands(player_key, commands):
     # ただのlist（cons形式でない）を返す
-    return [4, player_key, []]
+    return [4, player_key, actions_to_commands(commands)]
 
 def main():
     server_url = sys.argv[1]
