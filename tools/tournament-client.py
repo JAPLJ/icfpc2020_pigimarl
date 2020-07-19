@@ -16,9 +16,9 @@ def run(server_url, player_key, ship_parameter, solver):
     req_join = make_req_join(player_key)
     state = send(server_url, req_join)
 
-    # if state.game_stage != 0:
-    #     print('[RUNNER] invalid game stage:', state.game_stage)
-    #     exit(2)
+    if state.game_stage != GameStage.NOT_STARTED:
+        print('[RUNNER] invalid game stage:', state.game_stage)
+        exit(2)
 
     print('[RUNNER] start game, parameter:', ship_parameter.list())
     req_start = make_req_start(player_key, ship_parameter)
@@ -30,8 +30,8 @@ def run(server_url, player_key, ship_parameter, solver):
         req_commands = make_req_commands(player_key, commands)
         state = send(server_url, req_commands)
 
-        # if state.game_stage == 2:
-        #     break
+        if state.game_stage == GameStage.FINISHED:
+            break
 
     print('[RUNNER] game finished')
 
