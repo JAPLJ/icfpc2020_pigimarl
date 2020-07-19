@@ -49,11 +49,11 @@ def send(server_url, list_req):
     print('[Send] req:', list_req)
     cons_req = python_list_to_cons_list_recurse(list_req)
     mod_req = enc_from_cons_obj(cons_req)
-    http_res = requests.post(server_url, data=mod_req)
+    http_res = requests.post(server_url + '/aliens/send', data=mod_req)
     if http_res.status_code != 200:
         print('[Send] Unexpected server response:')
         print('[Send] HTTP code:', http_res.status_code)
-        print('[Send] Request:', req)
+        print('[Send] Request:', mod_req)
         print('[Send] Modulated request:', mod_req)
         print('[Send] Response body:', http_res.text)
         exit(2)
