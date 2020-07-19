@@ -56,7 +56,7 @@ class APPROACH_SUISIDE:
 
         dist = l_inf_dist(p1_next[0], p1_next[1], p2_next[0], p2_next[1])
 
-        if dist < self.suiside_dist_th:
+        if dist < self.suiside_dist_th and s1.side == Side.ATTACK:
             ret[s1.id].append(create_suiside_command())
 
         return ret
