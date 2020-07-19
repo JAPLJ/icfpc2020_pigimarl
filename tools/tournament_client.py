@@ -115,8 +115,8 @@ def main():
     json_log_path = None if len(sys.argv) < 4 else sys.argv[3]
 
     # sys.setrecursionlimit(1000000)
-    import test_ai
-    run(server_url, player_key, test_ai.TestAI(), json_log_path=json_log_path)
+    import escaper
+    run(server_url, player_key, escaper.Escaper(), json_log_path=json_log_path)
 
 
 if __name__ == '__main__':
