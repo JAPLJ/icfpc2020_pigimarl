@@ -37,7 +37,7 @@ class APPROACH_SUISIDE:
         self.into_orbit_moves = {}
         self.into_orbit_idx = 0
         self.into_orbit = False
-        self.num_split = 64
+        self.num_split = 128
 
     def set_specs(self, limit, side):
         p2 = 32
