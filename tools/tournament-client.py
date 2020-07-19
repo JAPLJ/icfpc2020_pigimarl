@@ -99,7 +99,7 @@ def main():
                     commands[ship.id] = [{'command': 'suicide'}]
                 return commands
 
-        def set_specs(self):
+        def set_specs(self, limit, side):
             return ShipParameter(1, 1, 1, 1)
 
     solver = Solver()
