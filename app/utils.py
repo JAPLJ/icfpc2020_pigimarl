@@ -85,7 +85,7 @@ def go_into_orbit(planet_r, x0, y0, vx0, vy0):
         ln += 1
 
 
-def stop(self, ship):
+def stop(ship):
     '''
     return tuple(int, int)
     速度の絶対値が小さくなるような加速方向を返す
