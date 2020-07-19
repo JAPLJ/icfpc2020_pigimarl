@@ -75,7 +75,7 @@ def go_into_orbit(planet_r, x0, y0, vx0, vy0):
     (x0, y0) から速度 (vx0, vy0) で始めたとき、256 ターンにわたって墜落しないかつ外に出ないような
     最初に行うべき accel の列を返す
     """
-    ln = 1
+    ln = 0
     while True:
         for d in range(8):
             dx, dy = DX[d], DY[d]
