@@ -23,6 +23,24 @@ def cons_list_to_python_list(cons_list):
         exit(2)
 
 
+def cons_list_to_python_list_recurse(cons_list):
+    if cons_list is None:
+        return []
+    elif (type(cons_list) is tuple) and (len(cons_list) == 2):
+        head = cons_list_to_python_list_recurse(cons_list[0])
+        tail = cons_list_to_python_list_recurse(cons_list[1])
+        if type(tail) is not list:
+            # 末尾に nil がないリスト対応
+            return [head] + [tail]
+        else:
+            return [head] + tail
+    elif type(cons_list) is int:
+        return cons_list
+    else:
+        print('Error! Not a cons list:', cons_list)
+        exit(2)
+
+
 def python_list_to_cons_list(python_list):
     """
     Python 形式の (普通の) リストを cons 形式のリストへ変換する。
