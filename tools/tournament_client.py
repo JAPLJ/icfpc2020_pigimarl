@@ -1,3 +1,4 @@
+from dataclasses import asdict
 import requests
 import sys
 from requests.exceptions import Timeout
@@ -37,7 +38,7 @@ def run(server_url, player_key, attacker_solver, defender_solver=None, json_log_
     req_start = make_req_start(player_key, ship_parameter)
     state = send(server_url, req_start)
     if json_logging:
-        json_logs.append(state.to_json())
+        json_logs.append(asdict(state))
 
     while True:
         print('[RUNNER] current_turn:', state.current_turn)
@@ -46,7 +47,7 @@ def run(server_url, player_key, attacker_solver, defender_solver=None, json_log_
         req_commands = make_req_commands(player_key, commands)
         state = send(server_url, req_commands)
         if json_logging:
-            json_logs.append(state.to_json())
+            json_logs.append(asdict(state))
 
         if state.game_stage == GameStage.FINISHED:
             break

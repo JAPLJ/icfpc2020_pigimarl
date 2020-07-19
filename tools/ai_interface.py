@@ -1,12 +1,10 @@
 # AI 側が受け取るステートや、返すコマンド達のデータ型の定義
 
 import dataclasses
-from dataclasses_json import dataclass_json
 from typing import List
 
 from common_interface import *
 
-@dataclass_json
 @dataclasses.dataclass
 class ResponseCommand:
     kind: int = -1
@@ -18,7 +16,6 @@ class ResponseCommand:
     p3: int = 0
     p4: int = 0
 
-@dataclass_json
 @dataclasses.dataclass
 class Ship:
     id: int
@@ -31,7 +28,6 @@ class Ship:
     temp: int
     commands: List[ResponseCommand]
 
-@dataclass_json
 @dataclasses.dataclass
 class State:
     game_stage: GameStage
