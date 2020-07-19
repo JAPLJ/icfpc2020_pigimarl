@@ -99,6 +99,19 @@ neighbours = [(-1, 0), (-1, -1), (0, -1), (1, -1), (1, 0), (1, 1), (0, 1), (-1, 
 
 
 def move_to_target(gravity_r, planet_r, sx, sy, vx, vy, tx, ty):
+    """
+    現在位置が (sx, sy) で現在速度が (vx, vy) のときに (tx, ty) へ移動して静止するための最初の加速度を返す
+    注意: abs(vx) <= 1 かつ abs(vy) <= 1 でなければならない
+    :param gravity_r:
+    :param planet_r:
+    :param sx:
+    :param sy:
+    :param vx:
+    :param vy:
+    :param tx:
+    :param ty:
+    :return:
+    """
     gr = gravity_r
     gx, gy = calc_gravity(sx, sy)
 
