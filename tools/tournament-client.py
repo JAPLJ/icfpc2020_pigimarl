@@ -101,26 +101,28 @@ def main():
 
     # sys.setrecursionlimit(1000000)
 
-    class AttackerSolver:
+    class SolverStasis:
         def action(self, state):
             commands = {}
             for ship in state.my_ships:
-                commands[ship.id] = [{'command': 'suicide'}]
+                ax = 0
+                ay = 0
+                if ship.x >= abs(ship.y):
+                    ax = 1
+                if ship.x <= -abs(ship.y):
+                    ax = -1
+                if ship.y >= abs(ship.x):
+                    ay = 1
+                if ship.y <= -abs(ship.x):
+                    ay = -1
+                commands[ship.id] = [{'command': 'accel', 'x': ax, 'y': ay}]
             return commands
 
         def set_specs(self, limit, side):
-            return ShipParameter(1, 1, 1, 1)
+            return ShipParameter(limit - 12 * 4 - 2 * 1, 0, 4, 1)
 
-    class DefenderSolver:
-        def action(self, state):
-            commands = {}
-            return commands
-
-        def set_specs(self, limit, side):
-            return ShipParameter(1, 1, 1, 1)
-
-    attacker = AttackerSolver()
-    defender = DefenderSolver()
+    attacker = SolverStasis()
+    defender = SolverStasis()
 
     run(server_url, player_key, defender, defender)
 
