@@ -83,3 +83,42 @@ def go_into_orbit(planet_r, x0, y0, vx0, vy0):
             if gravity_check(planet_r, x0, y0, vx0, vy0, ms):
                 return ms
         ln += 1
+
+
+def walk_on_square_orbit(planet_r, x, y, vx, vy, d):
+    if (vx, vy) == (0, 0):  # 静止状態ならまず時計回りに動き出す
+        if x <= planet_r and y < -planet_r:  # 左上
+            wx, wy = 1, 0
+        elif x > planet_r and y <= planet_r:  # 右上
+            wx, wy = 0, 1
+        elif x >= -planet_r and y > planet_r:  # 右下
+            wx, wy = -1, 0
+        elif x < -planet_r and y >= -planet_r:  # 左下
+            wx, wy = 0, -1
+        else:
+            print('(x, y) が planet 内だし')
+            exit(2)
+
+    else:
+        ma = max(x, y)
+        next_ma = max(x + vx, y + vy)
+        mi = min(x, y)
+        next_mi = min(x + vx, y + vy)
+
+        if ma == d and next_ma == d + 1:  # 半径 d の軌道から外れそうだから右折する
+            wx, vy = -vy, vx
+        elif mi == d and next_mi == d + 1:  # 半径 d の軌道に入れそうだから右折する
+            wx, vy = -vy, vx
+        else:  # 現状維持
+            wx, wy = vx, vy
+
+    gx, gy = calc_gravity(x, y)
+    return wx - vx - gx, wy - vy - gy
+
+
+def move_to_target(planet_r, x, y, vx, vy, tx, ty):
+    if (x, y) == (tx, ty):
+        gx, gy = calc_gravity(x, y)
+        return -vx - gx, -vy - gy
+    else:
+        walk_on_square_orbit(planet_r, x, y, vx, vy, max(tx, ty))
