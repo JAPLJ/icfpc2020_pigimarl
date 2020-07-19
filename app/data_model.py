@@ -1,6 +1,7 @@
 import dataclasses
 from typing import List
 
+
 @dataclasses.dataclass
 class Ship:
     id: int
@@ -10,6 +11,11 @@ class Ship:
     vx: int
     vy: int
     temp: int
+    energy: int
+    laser_power: int
+    colling_rate: int
+    soul: int
+
 
 @dataclasses.dataclass
 class State:
