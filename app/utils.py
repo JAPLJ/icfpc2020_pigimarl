@@ -1,43 +1,25 @@
-from typing import Tuple
-
-
-def l_inf_dist(x1, y1, x2, y2) -> int:
-    """
-    位置p1とp2のl_infty距離を計算する
-    """
-    return max(abs(x1 - x2), abs(y1 - y2))
-
-
-def normalize_vector(x, y) -> Tuple[int, int]:
-    if abs(x) > 0:
-        x //= abs(x)
-    if abs(y) > 0:
-        y //= abs(y)
-    return x, y
-
-
-def calc_normalized_direction(x1, y1, x2, y2) -> Tuple[int, int]:
-    """
-    (x1, y1) から (x2, y2) への向きを返す
-    ただし、各成分は -1, 0, 1のいずれかの値
-    """
-    dx = x2 - x1
-    dy = y2 - y1
-    return normalize_vector(dx, dy)
-
-
-def calc_gravity_acceration(x, y, gravity_radius) -> Tuple[int, int]:
-    d = l_inf_dist(x, y, 0, 0)
-    if d > gravity_radius:
-        return 0, 0
-
-    dir = calc_normalized_direction(x, y, 0, 0)
-    if abs(x) == abs(y) == d:
-        return dir
-    elif abs(x) == d:
-        return dir[0], 0
+def sign(val):
+    if val > 0:
+        return 1
+    elif val < 0:
+        return -1
     else:
-        return 0, dir[1]
+        return 0
+
+
+def calc_gravity(x, y):
+    """
+    座標 (x, y) に働く重力のベクトルを返す
+    :param x:
+    :param y:
+    :return:
+    """
+    if abs(x) > abs(y):
+        return -sign(x), 0
+    elif abs(x) < abs(y):
+        return 0, -sign(y)
+    else:
+        return -sign(x), -sign(y)
 
 
 def laser_damage(atk_ship_x, atk_ship_y, target_x, target_y, laser_power):
@@ -58,20 +40,46 @@ def laser_damage(atk_ship_x, atk_ship_y, target_x, target_y, laser_power):
     v = max(0, v0 - (vmax * 2 * y // d))
     return abs(v)
 
-def next_pos(planet_r, gravity_r, x, y, vx, vy):
+
+def next_pos(x, y, vx, vy):
+    gx, gy = calc_gravity(x, y)
+    vx += gx
+    vy += gy
+    x += vx
+    y += vy
+    return x, y, vx, vy
+
+
+DX = [-1, -1, -1, 0, 1, 1, 1, 0]
+DY = [-1, 0, 1, 1, 1, 0, -1, -1]
+
+
+def gravity_check(planet_r, x0, y0, vx0, vy0, moves):
     """
-    accelしない仮定して、次ターンの場所・速度を計算する
+    (x0, y0) から速度 (vx0, vy0) で始めて、かつ最初の len(moves) 回は moves に従って accel するとする
+    このとき 256 ターンにわたって墜落しないかつ外に出ないなら True を返す
     """
-    if max(abs(x), abs(y)) <= gravity_r:
-        if abs(x) <= abs(y):
-            if y > 0:
-                vy -= 1
-            elif y < 0:
-                vy += 1
-        if abs(y) <= abs(x):
-            if x > 0:
-                vx -= 1
-            elif x < 0:
-                vx += 1
-    x, y = x + vx, y + vy
-    return (x, y, vx, vy)
+    x, y = x0, y0
+    vx, vy = vx0, vy0
+    for i in range(256):
+        if i < len(moves):
+            vx, vy = vx + moves[i][0], vy + moves[i][1]
+        (x, y, vx, vy) = next_pos(x, y, vx, vy)
+        if max(abs(x), abs(y)) <= planet_r:
+            return False
+    return True
+
+
+def go_into_orbit(planet_r, x0, y0, vx0, vy0):
+    """
+    (x0, y0) から速度 (vx0, vy0) で始めたとき、256 ターンにわたって墜落しないかつ外に出ないような
+    最初に行うべき accel の列を返す
+    """
+    ln = 1
+    while True:
+        for d in range(8):
+            dx, dy = DX[d], DY[d]
+            ms = [(dx, dy) for i in range(ln)]
+            if gravity_check(planet_r, x0, y0, vx0, vy0, ms):
+                return ms
+        ln += 1
