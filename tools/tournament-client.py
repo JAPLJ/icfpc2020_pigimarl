@@ -1,5 +1,6 @@
 import requests
 import sys
+from requests.exceptions import Timeout
 
 from cons_list import *
 from mod_dem import *
@@ -51,7 +52,11 @@ def send(server_url, list_req):
     print('[Send] req:', list_req)
     cons_req = python_list_to_cons_list_recurse(list_req)
     mod_req = enc_from_cons_obj(cons_req)
-    http_res = requests.post(f'{server_url}/aliens/send?apiKey={API_KEY}', data=mod_req)
+    try:
+        http_res = requests.post(f'{server_url}/aliens/send?apiKey={API_KEY}', data=mod_req, timeout=10.0)
+    except Timeout:
+        print('[Send] timeout')
+        exit(2)
     if http_res.status_code != 200:
         print('[Send] Unexpected server response:')
         print('[Send] HTTP code:', http_res.status_code)
