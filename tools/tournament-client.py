@@ -1,4 +1,5 @@
 import requests
+import sys
 
 from cons_list import *
 from mod_dem import *
@@ -15,21 +16,22 @@ def run(server_url, player_key, ship_parameter, solver):
     req_join = make_req_join(player_key)
     state = send(server_url, req_join)
 
-    if state.game_stage != 0:
-        print('[RUNNER] invalid game stage:', state.game_stage)
+    # if state.game_stage != 0:
+    #     print('[RUNNER] invalid game stage:', state.game_stage)
+    #     exit(2)
 
-    print('[RUNNER] start game, parameter:', ship_parameter)
-    req_start = make_req_join(player_key, ship_parameter)
+    print('[RUNNER] start game, parameter:', ship_parameter.list())
+    req_start = make_req_start(player_key, ship_parameter)
     state = send(server_url, req_start)
 
     while True:
         commands = solver(state)
-        print('[RUNNER] send commands:', command)
-        req_commands = make_req_commands(commands)
+        print('[RUNNER] send commands:', commands)
+        req_commands = make_req_commands(player_key, commands)
         state = send(server_url, req_commands)
 
-        if state.game_stage == 2:
-            break
+        # if state.game_stage == 2:
+        #     break
 
     print('[RUNNER] game finished')
 
@@ -65,7 +67,7 @@ def parse_game_response(res):
 
 def make_req_join(player_key):
     # ただのlist（cons形式でない）を返す
-    return [2, player_key, [None]]
+    return [2, player_key, []]
 
 def make_req_start(player_key, ship_parameter):
     # ただのlist（cons形式でない）を返す
@@ -73,11 +75,19 @@ def make_req_start(player_key, ship_parameter):
 
 def make_req_commands(player_key, commands):
     # ただのlist（cons形式でない）を返す
-    return [4, player_key, [None]]
+    return [4, player_key, []]
 
 def main():
     server_url = sys.argv[1]
-    player_key = sys.argv[2]
+    player_key = int(sys.argv[2])
+
+    # sys.setrecursionlimit(1000000)
+
+    ship_parameter = ShipParameter(1, 1, 1, 1)
+    def solver(state):
+        return {}
+
+    run(server_url, player_key, ship_parameter, solver)
 
 
 if __name__ == '__main__':
