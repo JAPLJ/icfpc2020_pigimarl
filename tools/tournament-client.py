@@ -9,17 +9,23 @@ from conversion import *
 
 API_KEY = 'c16bab7da69d411da59ce8227e5d9034'
 
-def run(server_url, player_key, solver):
+def run(server_url, player_key, attacker_solver, defender_solver=None):
     """
     ゲームを一回分実行
-    ship_parameter: ゲーム開始時の初期パラメータ
+    sideに応じてsolverを使い分ける
+    使い分けの必要がない場合はdefender_solverを与えなくても良い
     solver:
         action func(State) -> Dict[int, List[Command]]
         set_specs func(limit: int, side: int) -> ShipParameter
+
     """
     print('[RUNNER] join game')
     req_join = make_req_join(player_key)
     (side, limit) = send(server_url, req_join)
+
+    solver = attacker_solver
+    if side == Side.DEFENSE and defender_solver is not None:
+        solver = defender_solver
 
     ship_parameter = solver.set_specs(limit, side)
     print('[RUNNER] start game, parameter:', ship_parameter.list())
@@ -36,7 +42,6 @@ def run(server_url, player_key, solver):
             break
 
     print('[RUNNER] game finished')
-
 
 def send(server_url, list_req):
     """
