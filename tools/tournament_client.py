@@ -1,3 +1,4 @@
+from dataclasses import asdict
 import requests
 import sys
 from requests.exceptions import Timeout
