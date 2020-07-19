@@ -19,14 +19,9 @@ def run(server_url, player_key, solver):
     """
     print('[RUNNER] join game')
     req_join = make_req_join(player_key)
-    state = send(server_url, req_join)
+    (side, limit) = send(server_url, req_join)
 
-    if state.game_stage != GameStage.NOT_STARTED:
-        print('[RUNNER] invalid game stage:', state.game_stage)
-        exit(2)
-
-    limit = 448 if state.your_side == Side.DEFENSE else 512
-    ship_parameter = solver.set_specs(limit, state.your_side)
+    ship_parameter = solver.set_specs(limit, side)
     print('[RUNNER] start game, parameter:', ship_parameter.list())
     req_start = make_req_start(player_key, ship_parameter)
     state = send(server_url, req_start)
