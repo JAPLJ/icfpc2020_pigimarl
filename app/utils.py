@@ -112,9 +112,9 @@ def walk_on_square_orbit(planet_r, x, y, vx, vy, d):
         next_mi = min(x + vx, y + vy)
 
         if ma == d and next_ma == d + 1:  # 半径 d の軌道から外れそうだから右折する
-            wx, vy = -vy, vx
+            wx, wy = -vy, vx
         elif mi == d and next_mi == d + 1:  # 半径 d の軌道に入れそうだから右折する
-            wx, vy = -vy, vx
+            wx, wy = -vy, vx
         else:  # 現状維持
             wx, wy = vx, vy
 
