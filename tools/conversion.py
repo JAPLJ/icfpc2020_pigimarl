@@ -82,6 +82,6 @@ def actions_to_commands(actions):
                 res.append([1, ship_id])
             elif cmd['command'] == 'laser': # レーザー
                 res.append([2, ship_id, Pt(cmd['x'], cmd['y']), cmd['power']])
-            elif cmd['split'] == 'split':   # 分裂
+            elif cmd['command'] == 'split':   # 分裂
                 res.append([3, ship_id, [cmd['p1'], cmd['p2'], cmd['p3'], cmd['p4']]])
     return res
