@@ -13,7 +13,7 @@ class Ship:
     temp: int
     energy: int
     laser_power: int
-    colling_rate: int
+    cooling_rate: int
     soul: int
 
 
