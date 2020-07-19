@@ -114,7 +114,6 @@ def main():
     player_key = int(sys.argv[2])
     json_log_path = None if len(sys.argv) < 4 else sys.argv[3]
 
-    # sys.setrecursionlimit(1000000)
     import escaper
     run(server_url, player_key, escaper.Escaper(), json_log_path=json_log_path)
 
