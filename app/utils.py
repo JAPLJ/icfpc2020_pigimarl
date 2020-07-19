@@ -1,4 +1,7 @@
 import random
+from collections import deque
+
+import numpy as np
 
 
 def sign(val):
@@ -91,40 +94,43 @@ def go_into_orbit(planet_r, x0, y0, vx0, vy0):
         ln += 1
 
 
-def walk_on_square_orbit(planet_r, x, y, vx, vy, d):
-    if (vx, vy) == (0, 0):  # 静止状態ならまず時計回りに動き出す
-        if x <= planet_r and y < -planet_r:  # 左上
-            wx, wy = 1, 0
-        elif x > planet_r and y <= planet_r:  # 右上
-            wx, wy = 0, 1
-        elif x >= -planet_r and y > planet_r:  # 右下
-            wx, wy = -1, 0
-        elif x < -planet_r and y >= -planet_r:  # 左下
-            wx, wy = 0, -1
-        else:
-            print('(x, y) が planet 内だし')
-            exit(2)
-
-    else:
-        ma = max(x, y)
-        next_ma = max(x + vx, y + vy)
-        mi = min(x, y)
-        next_mi = min(x + vx, y + vy)
-
-        if ma == d and next_ma == d + 1:  # 半径 d の軌道から外れそうだから右折する
-            wx, wy = -vy, vx
-        elif mi == d and next_mi == d + 1:  # 半径 d の軌道に入れそうだから右折する
-            wx, wy = -vy, vx
-        else:  # 現状維持
-            wx, wy = vx, vy
-
-    gx, gy = calc_gravity(x, y)
-    return wx - vx - gx, wy - vy - gy
+# 8 近傍
+neighbours = [(-1, 0), (-1, -1), (0, -1), (1, -1), (1, 0), (1, 1), (0, 1), (-1, 1)]
 
 
-def move_to_target(planet_r, x, y, vx, vy, tx, ty):
-    if (x, y) == (tx, ty):
-        gx, gy = calc_gravity(x, y)
-        return -vx - gx, -vy - gy
-    else:
-        return walk_on_square_orbit(planet_r, x, y, vx, vy, max(tx, ty))
+def move_to_target(gravity_r, planet_r, sx, sy, vx, vy, tx, ty):
+    gr = gravity_r
+    gx, gy = calc_gravity(sx, sy)
+
+    if (sx, sy) == (tx, ty):  # 目標の座標に到達したら静止する
+        return -(vx + gx), -(vy + gy)
+
+    dist = np.fill((gr * 2 + 1, gr * 2 + 1), 10 ** 9)
+    dist[tx + gr][ty + gr] = 0
+    q = deque()
+    q.append((tx, ty))
+
+    while len(q) > 0:
+        x, y = q.popleft()
+        if (x, y) == (sx, sy):
+            break
+
+        for dx, dy in neighbours:
+            nx = x + dx
+            ny = y + dy
+            if abs(nx) <= planet_r and abs(ny) <= planet_r:
+                continue
+            if abs(nx) <= gravity_r and abs(ny) <= gravity_r and dist[nx + gr][ny + gr] > dist[x + gr][y + gr] + 1:
+                dist[nx + gr][ny + gr] = dist[x + gr][y + gr] + 1
+                q.append((nx, ny))
+
+    for dx, dy in neighbours:
+        nx = sx + dx
+        ny = sy + dy
+        if abs(nx) <= gravity_r and abs(ny) <= gravity_r and dist[nx + gr][ny + gr] == dist[sx + gr][sy + gr] - 1:
+            ax = dx - (vx + gx)
+            ay = dy - (vy + gy)
+            if abs(ax) <= 2 and abs(ay) <= 2:
+                return ax, ay
+
+    return -(vx + gx), -(vy + gy)  # 一旦静止して次のターンに備える
