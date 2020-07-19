@@ -25,21 +25,20 @@ def game_response_to_state(resp):
     ships = game_state[2]
 
     # ships = [ def_ships, atk_ships ]
-    def_ships = convert_ships(ships[0])
-    atk_ships = convert_ships(ships[1])
+    (def_ships, atk_ships) = convert_ships(ships)
 
     return State(game_stage=game_stage,
                  planet_radius=planet_radius,
                  gravity_radius=gravity_radius,
                  current_turn=current_turn,
-                 my_side=side,
-                 my_ships=def_ships if my_side == DEFENSE else atk_ships,
-                 enemy_ships=atk_ships if my_side == ATTACK else def_ships)
+                 my_side=my_side,
+                 my_ships=def_ships if my_side == Side.DEFENSE else atk_ships,
+                 enemy_ships=atk_ships if my_side == Side.ATTACK else def_ships)
 
 
 def convert_ships(resp):
     """ふね変換くん"""
-    ships = []
+    ships = [[], []]
     for ship in resp:
         (ship_info, _) = ship   # commands: unsupported
         side = ship_info[0]
@@ -48,7 +47,7 @@ def convert_ships(resp):
         (vx, vy) = ship_info[3]
         params = ShipParameter(*ship_info[4])
         temp = ship_info[5]
-        ships.append(Ship(id=id, side=side, x=x, y=y, vx=vx, vy=vy, params=params, temp=temp))
+        ships[side].append(Ship(id=id, side=side, x=x, y=y, vx=vx, vy=vy, params=params, temp=temp))
     return ships
 
 

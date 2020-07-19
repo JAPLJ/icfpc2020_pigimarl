@@ -22,5 +22,5 @@ class ShipParameter:
     cooling_rate: int
     soul: int
 
-    def list():
+    def list(self):
         return [self.energy, self.laser_power, self.cooling_rate, self.soul]
