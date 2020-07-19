@@ -112,11 +112,13 @@ def main():
     # sys.setrecursionlimit(1000000)
     import rotating_ai
     import drop_the_bomb
+    import sniper
 
-    rotating = rotating_ai.RotatingAI()
-    dtb = drop_the_bomb.DropThe2Bombs()
+    # rotating = rotating_ai.RotatingAI()
+    # dtb = drop_the_bomb.DropThe2Bombs()
+    sniper = sniper.Sniper()
 
-    run(server_url, player_key, dtb, json_log_path=json_log_path)
+    run(server_url, player_key, sniper, json_log_path=json_log_path)
 
 
 if __name__ == '__main__':
