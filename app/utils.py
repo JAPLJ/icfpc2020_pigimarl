@@ -60,14 +60,14 @@ DX = [-1, -1, -1, 0, 1, 1, 1, 0]
 DY = [-1, 0, 1, 1, 1, 0, -1, -1]
 
 
-def gravity_check(planet_r, gravity_r, x0, y0, vx0, vy0, moves):
+def gravity_check(planet_r, gravity_r, x0, y0, vx0, vy0, moves, turn=256):
     """
     (x0, y0) から速度 (vx0, vy0) で始めて、かつ最初の len(moves) 回は moves に従って accel するとする
     このとき 256 ターンにわたって墜落しないかつ外に出ないなら True を返す
     """
     x, y = x0, y0
     vx, vy = vx0, vy0
-    for i in range(256):
+    for i in range(turn):
         if i < len(moves):
             vx, vy = vx + moves[i][0], vy + moves[i][1]
         (x, y, vx, vy) = next_pos(x, y, vx, vy)
