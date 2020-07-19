@@ -1,3 +1,4 @@
+from dataclasses import asdict
 import requests
 import sys
 from requests.exceptions import Timeout
@@ -19,8 +20,8 @@ def run(server_url, player_key, attacker_solver, defender_solver=None, json_log_
         set_specs func(limit: int, side: int) -> ShipParameter
 
     """
-    # json_logging = json_log_path is not None
-    # json_logs = []
+    json_logging = json_log_path is not None
+    json_logs = []
 
     print('[RUNNER] join game')
     req_join = make_req_join(player_key)
@@ -34,23 +35,25 @@ def run(server_url, player_key, attacker_solver, defender_solver=None, json_log_
     print('[RUNNER] start game, parameter:', ship_parameter.list())
     req_start = make_req_start(player_key, ship_parameter)
     state = send(server_url, req_start)
-    # if json_logging:
-    #     json_logs.append(state.to_json())
+    if json_logging:
+        json_logs.append(asdict(state))
 
     while True:
         commands = solver.action(state)
         print('[RUNNER] send commands:', commands)
         req_commands = make_req_commands(player_key, commands)
         state = send(server_url, req_commands)
-        # if json_logging:
-        #     json_logs.append(state.to_json())
+        if json_logging:
+            json_logs.append(asdict(state))
 
         if state.game_stage == GameStage.FINISHED:
             break
     
-    # if json_logging:
-    #     with open(json_log_path, 'w') as f:
-    #         f.write(f'[{",".join(json_logs)}]')
+    if json_logging:
+        import json
+        with open(json_log_path, 'w') as f:
+            f.write(json.dumps(json_logs))
+            # f.write(f'[{",".join(json_logs)}]')
 
     print('[RUNNER] game finished')
 
@@ -91,7 +94,7 @@ def parse_game_response(res):
 
 def make_req_join(player_key):
     # ただのlist（cons形式でない）を返す
-    return [2, player_key, []]
+    return [2, player_key, [103652820, 192496425430]]
 
 def make_req_start(player_key, ship_parameter):
     # ただのlist（cons形式でない）を返す
@@ -108,10 +111,14 @@ def main():
 
     # sys.setrecursionlimit(1000000)
     import rotating_ai
+    import drop_the_bomb
+    import sniper
 
-    solver = rotating_ai.RotatingAI()
+    # rotating = rotating_ai.RotatingAI()
+    # dtb = drop_the_bomb.DropThe2Bombs()
+    sniper = sniper.Sniper()
 
-    run(server_url, player_key, solver, json_log_path=json_log_path)
+    run(server_url, player_key, sniper, json_log_path=json_log_path)
 
 
 if __name__ == '__main__':

@@ -6,7 +6,7 @@ sys.path.append('app/')
 from utils import *
 
 
-class RotatingAI:
+class Sniper:
     def __init__(self):
         self.into_orbit = dict()
         self.into_orbit_moves = dict()
@@ -30,19 +30,25 @@ class RotatingAI:
                 self.into_orbit[ship.id] = self.into_orbit_moves_idx[ship.id] == len(self.into_orbit_moves[ship.id])
             
             to_attack = None
-            max_dmg = -1
+            max_dmg = 0
             for eship in state.enemy_ships:
                 if sum(eship.params.list()) == 0:
                     # 死んでるし
                     continue
+
+                pvx, pvy = 0, 0
+                for rc in eship.commands:
+                    if rc.kind == 0:
+                        pvx, pvy = -rc.x, -rc.y
                 
-                (nx, ny, _, _) = next_pos(state.planet_radius, eship.x, eship.y, eship.vx, eship.vy)
-                max_lp = min(ship.params.laser_power, 64 - ship.temp)
+                (nx, ny, _, _) = next_pos(state.planet_radius, eship.x, eship.y, eship.vx + pvx, eship.vy + pvy)
+                max_lp = min(ship.params.laser_power, ship.max_temp - ship.temp)
                 ldmg = laser_damage(ship.x, ship.y, nx, ny, max_lp)
-                if ldmg > max_dmg:
+                edmg = ldmg - (eship.max_temp - eship.temp)
+                if edmg > max_dmg:
                     to_attack = {'command': 'laser', 'x': nx, 'y': ny, 'power': max_lp}
-                    max_dmg = ldmg
-            if ldmg > 10 and ldmg >= max_lp * 3 / 10 and to_attack is not None:
+                    max_dmg = edmg
+            if edmg > 0 and to_attack is not None:
                 res[ship.id].append(to_attack)
 
         return res
@@ -50,4 +56,7 @@ class RotatingAI:
 
     def set_specs(self, limit, side):
         souls = 100
-        return ShipParameter(limit - (64*4 + 12*10 + 1*2), 64, 10, 1)
+        if side == Side.ATTACK:
+            return ShipParameter(limit - (96*4 + 12*8 + 1*2), 96, 8, 1)
+        else:
+            return ShipParameter(limit - (32*4 + 12*16 + 1*2), 32, 16, 1)

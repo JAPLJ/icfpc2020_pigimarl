@@ -49,6 +49,7 @@ def convert_ships(resp):
         (vx, vy) = ship_info[3]
         params = ShipParameter(*ship_info[4])
         temp = ship_info[5]
+        max_temp = ship_info[6]
         cmds = []
         for rc in rcmds:
             r = ResponseCommand()
@@ -64,7 +65,7 @@ def convert_ships(resp):
             elif r.kind == 3:   # 分裂
                 r.p1, r.p2, r.p3, r.p4 = rc[1]
             cmds.append(r)
-        ships[side].append(Ship(id=id, side=side, x=x, y=y, vx=vx, vy=vy, params=params, temp=temp, commands=cmds))
+        ships[side].append(Ship(id=id, side=side, x=x, y=y, vx=vx, vy=vy, params=params, temp=temp, max_temp=max_temp, commands=cmds))
     return ships
 
 
@@ -82,6 +83,6 @@ def actions_to_commands(actions):
                 res.append([1, ship_id])
             elif cmd['command'] == 'laser': # レーザー
                 res.append([2, ship_id, Pt(cmd['x'], cmd['y']), cmd['power']])
-            elif cmd['split'] == 'split':   # 分裂
+            elif cmd['command'] == 'split':   # 分裂
                 res.append([3, ship_id, [cmd['p1'], cmd['p2'], cmd['p3'], cmd['p4']]])
     return res
