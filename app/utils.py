@@ -134,3 +134,23 @@ def move_to_target(gravity_r, planet_r, sx, sy, vx, vy, tx, ty):
                 return ax, ay
 
     return -(vx + gx), -(vy + gy)  # 一旦静止して次のターンに備える
+
+
+def stop(x, y, vx, vy):
+    '''
+    return tuple(int, int)
+    速度の絶対値が小さくなるような加速方向を返す
+    運が悪いとplanetに落ちる
+    '''
+
+    def _stop(v, g):
+        v_next = v + g
+        if v_next > 0:
+            return -1
+        elif v_next < 0:
+            return +1
+        else:
+            return 0
+
+    gx, gy = calc_gravity(x, y)
+    return (_stop(vx, gx), _stop(vy, gy))

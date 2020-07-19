@@ -96,7 +96,7 @@ def parse_game_response(res):
 
 def make_req_join(player_key):
     # ただのlist（cons形式でない）を返す
-    return [2, player_key, []]
+    return [2, player_key, [103652820, 192496425430]]
 
 
 def make_req_start(player_key, ship_parameter):
