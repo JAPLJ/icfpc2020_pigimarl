@@ -77,11 +77,11 @@ def actions_to_commands(actions):
     for ship_id in actions:
         for cmd in actions[ship_id]:
             if cmd['command'] == 'accel':    # 推進
-                res.append([0, ship_id, [-cmd['x'], -cmd['y']]])
+                res.append([0, ship_id, Pt(-cmd['x'], -cmd['y'])])
             elif cmd['command'] == 'suicide':   # 自爆
                 res.append([1, ship_id])
             elif cmd['command'] == 'laser': # レーザー
-                res.append([2, ship_id, [cmd['x'], cmd['y']], cmd['power']])
+                res.append([2, ship_id, Pt(cmd['x'], cmd['y']), cmd['power']])
             elif cmd['split'] == 'split':   # 分裂
                 res.append([3, ship_id, [cmd['p1'], cmd['p2'], cmd['p3'], cmd['p4']]])
     return res

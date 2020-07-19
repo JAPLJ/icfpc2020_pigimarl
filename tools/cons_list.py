@@ -56,6 +56,8 @@ def python_list_to_cons_list(python_list):
         print('Error! Not a Python list:', python_list)
         exit(2)
 
+from common_interface import Pt
+
 def python_list_to_cons_list_recurse(python_list):
     if type(python_list) is list:
         if len(python_list) == 0:
@@ -66,6 +68,8 @@ def python_list_to_cons_list_recurse(python_list):
             return (head, tail)
     elif type(python_list) is int:
         return python_list
+    elif isinstance(python_list, Pt):
+        return (python_list.x, python_list.y)
     else:
         print('Error! Not a Python list:', python_list)
         exit(2)
