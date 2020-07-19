@@ -6,6 +6,7 @@ from ai_interface import *
 sys.path.append('app')
 from utils import *
 from collections import defaultdict
+import random
 
 TEMP_LIMIT = 64
 
@@ -16,19 +17,25 @@ class AI:
         if len(enemy_ships) == 0:
             return {}
         enemy_ship = state.enemy_ships[0]
-        target_x, target_y, _, _ = next_pos(state.planet_radius, state.gravity_radius, enemy_ship.x, enemy_ship.y, enemy_ship.vx, enemy_ship.vy)
+        target_x, target_y, _, _ = next_pos(enemy_ship.x, enemy_ship.y, enemy_ship.vx, enemy_ship.vy)
         # もし相手が残り1体で体力も少なかったらこのターンで決着をつける
         if len(enemy_ships) == 1 and self.__can_kill_in_this_turn(state.my_ships, enemy_ships[0]):
             for ship in state.my_ships:
                 laser_power = ship.params.laser_power  # フルバースト
                 commands[ship.id] = [{"command": "laser", "power": laser_power, "x": target_x, "y":target_y}]
 
-        # 一番IDが小さい敵を撃つ。有効なダメージじゃなかったらやめる
         for ship in state.my_ships:
+            # 一番IDが小さい敵を撃つ。有効なダメージじゃなかったらやめる
             laser_power = min(ship.params.laser_power, TEMP_LIMIT - ship.temp)
             expected_damage = laser_damage(ship.x, ship.y, target_x, target_y, laser_power)
             if expected_damage <= enemy_ship.params.cooling_rate: continue
             commands[ship.id] = [{"command": "laser", "power": laser_power, "x": target_x, "y":target_y}]
+
+            # random walk
+            gravity_x, gravity_y = calc_gravity(ship.x, ship.y)
+            dx = min(max(random.randint(-1, 1) - gravity_x, -1), 1)
+            dy = min(max(random.randint(-1, 1) - gravity_y, -1), 1)
+            commands[ship.id] = [{"command": "accel", "x": dx, "y": dy}]
 
         return commands
 
