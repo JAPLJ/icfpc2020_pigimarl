@@ -83,3 +83,21 @@ def go_into_orbit(planet_r, x0, y0, vx0, vy0):
             if gravity_check(planet_r, x0, y0, vx0, vy0, ms):
                 return ms
         ln += 1
+
+
+def stop(self, ship):
+    '''
+    return tuple(int, int)
+    速度の絶対値が小さくなるような加速方向を返す
+    運が悪いとplanetに落ちる
+    '''
+    def _stop(v, g):
+        v_next = v + g
+        if v_next > 0:
+            return -1
+        elif v_next < 0:
+            return +1
+        else:
+            return 0
+    gx, gy = calc_gravity(ship.x, ship.y)
+    return (_stop(ship.vx, gx), _stop(ship.vy, gy))
