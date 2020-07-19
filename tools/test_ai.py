@@ -21,7 +21,7 @@ class TestAI:
             else:
                 tx = state.planet_radius + 1
                 ty = state.planet_radius + 1
-            ax, ay = move_to_target(state.planet_radius, ship.x, ship.y, ship.vx, ship.vy, tx, ty)
+            ax, ay = move_to_target(state.gravity_radius, state.planet_radius, ship.x, ship.y, ship.vx, ship.vy, tx, ty)
             res[ship.id] = [{'command': 'accel', 'x': ax, 'y': ay}]
 
         return res
