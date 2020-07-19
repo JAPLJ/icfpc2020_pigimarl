@@ -12,10 +12,16 @@ TEMP_LIMIT = 64
 class AI:
     def action(self, state):
         commands = defaultdict(list)
-        # もし相手が残り1体で体力も少なかったらこのターンで決着をつける
-        # if len(state.enemy_ships) == 1 and self.__can_kill_in_this_turn(state.my_ships, state.enemy_ships[0]):
+        enemy_ships = list(filter(lambda eship: eship.params.soul != 0, state.enemy_ships))
+        if len(enemy_ships) == 0:
+            return {}
         enemy_ship = state.enemy_ships[0]
         target_x, target_y, _, _ = next_pos(state.planet_radius, state.gravity_radius, enemy_ship.x, enemy_ship.y, enemy_ship.vx, enemy_ship.vy)
+        # もし相手が残り1体で体力も少なかったらこのターンで決着をつける
+        if len(enemy_ships) == 1 and self.__can_kill_in_this_turn(state.my_ships, enemy_ships[0]):
+            for ship in state.my_ships:
+                laser_power = ship.params.laser_power  # フルバースト
+                commands[ship.id] = [{"command": "laser", "power": laser_power, "x": target_x, "y":target_y}]
 
         for ship in state.my_ships:
             laser_power = min(ship.params.laser_power, TEMP_LIMIT - ship.temp)
