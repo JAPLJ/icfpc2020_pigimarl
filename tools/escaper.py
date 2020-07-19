@@ -14,16 +14,23 @@ class Escaper:
 
     def __init__(self):
         self.into_orbit_moves = None
+        self.past_acc = (0, 0)
 
     def finc_valid_acc(self, ship, planet_radius, gravity_radius):
         a_range = range(-ship.max_accel, ship.max_accel + 1)
+        acc_candidate = []
         for ax, ay in product(a_range, a_range):
             if (ax, ay) == (0, 0):
                 continue
             moves = [(ax, ay)]
             if utils.gravity_check(planet_radius, gravity_radius,
                                    ship.x, ship.y, ship.vx, ship.vy, moves, self.CHECK_TURN):
-                return (ax, ay)
+                acc_candidate.append((ax, ay))
+        for acc in acc_candidate:
+            if acc != self.past_acc:
+                return acc
+        if acc_candidate:
+            return acc_candidate[0]
         return stop(ship.x, ship.y, ship.vx, ship.vy)
 
     def action(self, state):
@@ -59,6 +66,7 @@ class Escaper:
 
         if acc != (0, 0):
             commands.append({'command': 'accel', 'x': acc[0], 'y': acc[1]})
+        self.past_acc = acc
         return {ship.id: commands}
 
 
