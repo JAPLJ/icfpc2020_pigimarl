@@ -135,7 +135,6 @@ def main():
 
     attacker = SolverStasis()
     defender = SolverStasis()
-
     run(server_url, player_key, attacker, defender, json_log_path=json_log_path)
 
 
