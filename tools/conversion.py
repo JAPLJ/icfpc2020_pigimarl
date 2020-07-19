@@ -35,7 +35,7 @@ def game_response_to_state(resp):
                  current_turn=current_turn,
                  my_side=my_side,
                  my_ships=def_ships if my_side == Side.DEFENSE else atk_ships,
-                 enemy_ships=atk_ships if my_side == Side.ATTACK else def_ships)
+                 enemy_ships=def_ships if my_side == Side.ATTACK else atk_ships)
 
 
 def convert_ships(resp):
