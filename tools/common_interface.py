@@ -3,6 +3,11 @@
 from enum import IntEnum
 import dataclasses
 
+class Pt:
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+
 
 class GameStage(IntEnum):
     NOT_STARTED = 0
