@@ -16,9 +16,9 @@ def run(server_url, player_key, ship_parameter, solver):
     req_join = make_req_join(player_key)
     state = send(server_url, req_join)
 
-    # if state.game_stage != 0:
-    #     print('[RUNNER] invalid game stage:', state.game_stage)
-    #     exit(2)
+    if state.game_stage != GameStage.NOT_STARTED:
+        print('[RUNNER] invalid game stage:', state.game_stage)
+        exit(2)
 
     print('[RUNNER] start game, parameter:', ship_parameter.list())
     req_start = make_req_start(player_key, ship_parameter)
@@ -30,8 +30,8 @@ def run(server_url, player_key, ship_parameter, solver):
         req_commands = make_req_commands(player_key, commands)
         state = send(server_url, req_commands)
 
-        # if state.game_stage == 2:
-        #     break
+        if state.game_stage == GameStage.FINISHED:
+            break
 
     print('[RUNNER] game finished')
 
@@ -42,20 +42,22 @@ def send(server_url, list_req):
     req: list（cons形式でない）
     return: state: GameResponseをパースしたもの
     """
+    print('[Send] req:' list_req)
     cons_req = python_list_to_cons_list_recurse(list_req)
     mod_req = enc_from_cons_obj(cons_req)
     http_res = requests.post(server_url, data=mod_req)
     if http_res.status_code != 200:
-        print('Unexpected server response:')
-        print('HTTP code:', http_res.status_code)
-        print('Request:', req)
-        print('Modulated request:', mod_req)
-        print('Response body:', http_res.text)
+        print('[Send] Unexpected server response:')
+        print('[Send] HTTP code:', http_res.status_code)
+        print('[Send] Request:', req)
+        print('[Send] Modulated request:', mod_req)
+        print('[Send] Response body:', http_res.text)
         exit(2)
 
     mod_res = http_res.text
     cons_res = dec_to_cons_obj(mod_res)
     list_res = cons_list_to_python_list_recurse(cons_res)
+    print('[Send] res: list_res')
     return parse_game_response(list_res)
 
 def parse_game_response(res):
