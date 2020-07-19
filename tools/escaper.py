@@ -9,15 +9,25 @@ import utils
 
 class Escaper:
     COOL_RATE = 16
-    CHECK_TURN = 10 # 直後10ターンで墜落・範囲外にならないことを確認
+    CHECK_TURN = 20 # 今後このターンで墜落・範囲外にならないことを確認
     ESCAPE_DMG = 50 # これ以上のダメージ（温度増加含む）で回避行動を取る
 
     def __init__(self):
         self.into_orbit_moves = None
 
+    def finc_valid_acc(self, ship, planet_radius, gravity_radius):
+        a_range = range(-ship.max_accel, ship.max_accel + 1)
+        for ax, ay in product(a_range, a_range):
+            moves = [(ax, ay)]
+            if utils.gravity_check(state.planet_radius, state.gravity_radius,
+                                   ship.x, ship.y, ship.vx, ship.vy, moves, self.CHECK_TURN):
+                return (ax, ay)
+        return stop(ship.x, ship.y, ship.vx, ship.vy)
+
     def action(self, state):
         commands = []
         ship = state.my_ships[0]
+        acc = (0, 0)
 
         if self.into_orbit_moves is None:
             self.into_orbit_moves = utils.go_into_orbit(
@@ -25,7 +35,10 @@ class Escaper:
 
         if len(self.into_orbit_moves) > 0:
             acc = self.into_orbit_moves.pop(0)
-            commands.append({'command': 'accel', 'x': acc[0], 'y': acc[1]})
+
+        elif not utils.gravity_check(state.planet_radius, state.gravity_radius,
+                                     ship.x, ship.y, ship.vx, ship.vy, [], self.CHECK_TURN):
+            acc = self.finc_valid_acc(ship, state.planet_radius, state.gravity_radius)
 
         else:
             max_dmg = 0
@@ -39,16 +52,11 @@ class Escaper:
                 max_dmg = max(max_dmg, dmg)
 
             if max_dmg > self.ESCAPE_DMG:
-                acc = None
                 a_range = range(-ship.max_accel, ship.max_accel + 1)
-                for ax, ay in product(a_range, a_range):
-                    moves = [(ax, ay)]
-                    if utils.gravity_check(state.planet_radius, state.gravity_radius,
-                                           ship.x, ship.y, ship.vx, ship.vy, moves, self.CHECK_TURN):
-                        acc = (ax, ay)
-                if acc:
-                    commands.append({'command': 'accel', 'x': acc[0], 'y': acc[1]})
+                acc = self.finc_valid_acc(ship, state.planet_radius, state.gravity_radius)
 
+        if acc != (0, 0):
+            commands.append({'command': 'accel', 'x': acc[0], 'y': acc[1]})
         return {ship.id: commands}
 
 
