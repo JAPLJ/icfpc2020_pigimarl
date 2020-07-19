@@ -42,9 +42,9 @@ class Sniper:
                         pvx, pvy = -rc.x, -rc.y
                 
                 (nx, ny, _, _) = next_pos(state.planet_radius, eship.x, eship.y, eship.vx + pvx, eship.vy + pvy)
-                max_lp = min(ship.params.laser_power, 64 - ship.temp)
+                max_lp = min(ship.params.laser_power, ship.max_temp - ship.temp)
                 ldmg = laser_damage(ship.x, ship.y, nx, ny, max_lp)
-                edmg = ldmg - (64 - eship.temp)
+                edmg = ldmg - (eship.max_temp - eship.temp)
                 if edmg > max_dmg:
                     to_attack = {'command': 'laser', 'x': nx, 'y': ny, 'power': max_lp}
                     max_dmg = edmg
@@ -56,4 +56,7 @@ class Sniper:
 
     def set_specs(self, limit, side):
         souls = 100
-        return ShipParameter(limit - (64*4 + 12*10 + 1*2), 64, 10, 1)
+        if side == Side.ATTACK:
+            return ShipParameter(limit - (96*4 + 12*8 + 1*2), 96, 8, 1)
+        else:
+            return ShipParameter(limit - (32*4 + 12*16 + 1*2), 32, 16, 1)
