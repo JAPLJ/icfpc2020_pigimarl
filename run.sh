@@ -1,3 +1,3 @@
 #!/bin/sh
 
-python app/main.py "$@" || echo "run error code: $?"
+python3 tools/tournament-client.py "$@" || echo "run error code: $?"

@@ -8,6 +8,7 @@ from common_interface import *
 from conversion import *
 
 API_KEY = 'c16bab7da69d411da59ce8227e5d9034'
+TURN_MAX = 256
 
 def run(server_url, player_key, attacker_solver, defender_solver=None):
     """
@@ -21,18 +22,20 @@ def run(server_url, player_key, attacker_solver, defender_solver=None):
     """
     print('[RUNNER] join game')
     req_join = make_req_join(player_key)
-    (side, limit) = send(server_url, req_join)
+    (my_side, limit) = send(server_url, req_join)
 
+    print('[RUNNER] your side:', 'Defense' if my_side == Side.DEFENSE else 'Attack')
     solver = attacker_solver
-    if side == Side.DEFENSE and defender_solver is not None:
+    if my_side == Side.DEFENSE and defender_solver is not None:
         solver = defender_solver
 
-    ship_parameter = solver.set_specs(limit, side)
+    ship_parameter = solver.set_specs(limit, my_side)
     print('[RUNNER] start game, parameter:', ship_parameter.list())
     req_start = make_req_start(player_key, ship_parameter)
     state = send(server_url, req_start)
 
     while True:
+        print('[RUNNER] current_turn:', state.current_turn)
         commands = solver.action(state)
         print('[RUNNER] send commands:', commands)
         req_commands = make_req_commands(player_key, commands)
@@ -42,6 +45,8 @@ def run(server_url, player_key, attacker_solver, defender_solver=None):
             break
 
     print('[RUNNER] game finished')
+    winner = Side.DEFENSE if state.current_turn == TURN_MAX else Side.ATTACK
+    print(f'[RUNNER] you {"win" if winner == my_side else "lose"}')
 
 def send(server_url, list_req):
     """
@@ -96,7 +101,7 @@ def main():
 
     # sys.setrecursionlimit(1000000)
 
-    class Solver:
+    class AttackerSolver:
         def action(self, state):
             commands = {}
             for ship in state.my_ships:
@@ -106,9 +111,18 @@ def main():
         def set_specs(self, limit, side):
             return ShipParameter(1, 1, 1, 1)
 
-    solver = Solver()
+    class DefenderSolver:
+        def action(self, state):
+            commands = {}
+            return commands
 
-    run(server_url, player_key, solver)
+        def set_specs(self, limit, side):
+            return ShipParameter(1, 1, 1, 1)
+
+    attacker = AttackerSolver()
+    defender = DefenderSolver()
+
+    run(server_url, player_key, attacker, defender)
 
 
 if __name__ == '__main__':
