@@ -1,7 +1,7 @@
 import sys
 import utils
 
-sys.path.append("/Users/um003592/icfpc2020/icfpc2020_pigimarl/tools")
+sys.path.append("tools/")
 
 from common_interface import *
 
