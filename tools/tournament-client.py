@@ -2,16 +2,8 @@ import requests
 
 from cons_list import *
 from mod_dem import *
-
-class ShipParameter:
-    def __init__(self, energy, laser_power, cooling_rate, soul):
-        self.energy = energy
-        self.laser_power = laser_power
-        self.cooling_rate = cooling_rate
-        self.soul = soul
-
-    def list():
-        return [self.energy, self.laser_power, self.cooling_rate, self.soul]
+from common_interface import *
+from conversion import *
 
 def run(server_url, player_key, ship_parameter, solver):
     """
@@ -48,7 +40,7 @@ def send(server_url, list_req):
     req: list（cons形式でない）
     return: state: GameResponseをパースしたもの
     """
-    cons_req = python_list_to_cons_list(list_req)
+    cons_req = python_list_to_cons_list_recurse(list_req)
     mod_req = enc_from_cons_obj(cons_req)
     http_res = requests.post(server_url, data=mod_req)
     if http_res.status_code != 200:
@@ -61,14 +53,14 @@ def send(server_url, list_req):
 
     mod_res = http_res.text
     cons_res = dec_to_cons_obj(mod_res)
-    list_res = cons_list_to_python_list(cons_res)
+    list_res = cons_list_to_python_list_recurse(cons_res)
     return parse_game_response(list_res)
 
 def parse_game_response(res):
     """
     GameResponseのlistをパースする
     """
-    return {} # tekitou
+    return game_response_to_state(res)
 
 
 def make_req_join(player_key):
