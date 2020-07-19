@@ -25,6 +25,7 @@ def run(server_url, player_key, ship_parameter, solver):
 
     if state.game_stage != 0:
         print('[RUNNER] invalid game stage:', state.game_stage)
+        exit(2)
 
     print('[RUNNER] start game, parameter:', ship_parameter)
     req_start = make_req_join(player_key, ship_parameter)
