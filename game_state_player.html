@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <link href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/@mdi/font@5.x/css/materialdesignicons.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.css" rel="stylesheet">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
+</head>
+<body>
+  <div id="app">
+    <v-app>
+        <v-main>
+          <v-navigation-drawer
+          width="400"
+          permanent
+          dark
+          app
+        >
+          <v-list
+            dense
+            nav
+            class="py-0"
+          >
+            <v-list-item two-line :class="miniVariant && 'px-0'">
+              <v-list-item-content>
+                <v-list-item-title>Game State</v-list-item-title>
+                <v-list-item-sub-title>
+                  Side: {{ currentGameState.my_side === 1 ? '攻' : '守' }}: Turn {{ currentGameState.current_turn }}
+                </v-list-item-title>
+              </v-list-item-content>
+            </v-list-item>
+            <v-divider></v-divider>
+          <v-data-iterator
+            :items="myShips"
+            hide-default-footer
+          >
+            <template v-slot:header>
+              <v-toolbar
+                class="mb-2"
+                color="pink darken-5"
+                dark
+                flat
+                dense
+                small
+              >
+              <v-toolbar-title>My Ships</v-toolbar-title>
+              </v-toolbar>
+            </template>
+            <template v-slot:default="props">
+              <v-row>
+                <v-col
+                  v-for="item in props.items"
+                  :key="item.name"
+                  cols="12"
+                  sm="12"
+                  md="6"
+                  lg="6"
+                >
+                  <v-card>
+                    <v-card-title class="subheading font-weight-bold">ID: {{ item.id }}</v-card-title>
+      
+                    <v-divider></v-divider>
+      
+                    <v-list dense small>
+                      <v-list-item>
+                        <v-list-item-content>x, y:</v-list-item-content>
+                        <v-list-item-content class="align-end">{{ item.x }}, {{item.y}} </v-list-item-content>
+                      </v-list-item>
+      
+                      <v-list-item>
+                        <v-list-item-content>vx, vy:</v-list-item-content>
+                        <v-list-item-content class="align-end">{{ item.vx}}, {{ item.vy }}</v-list-item-content>
+                      </v-list-item>
+      
+                      <v-list-item>
+                        <v-list-item-content>Energy:</v-list-item-content>
+                        <v-list-item-content class="align-end">{{ item.params.energy }}</v-list-item-content>
+                      </v-list-item>
+      
+                      <v-list-item>
+                        <v-list-item-content>Laser Power:</v-list-item-content>
+                        <v-list-item-content class="align-end">{{ item.params.laser_power }}</v-list-item-content>
+                      </v-list-item>
+      
+                      <v-list-item>
+                        <v-list-item-content>Cooling Rate:</v-list-item-content>
+                        <v-list-item-content class="align-end">{{ item.params.cooling_rate }}</v-list-item-content>
+                      </v-list-item>
+      
+                      <v-list-item>
+                        <v-list-item-content>Soul:</v-list-item-content>
+                        <v-list-item-content class="align-end">{{ item.params.soul }}</v-list-item-content>
+                      </v-list-item>
+      
+                      <v-list-item>
+                        <v-list-item-content>Temp:</v-list-item-content>
+                        <v-list-item-content class="align-end">{{ item.temp }}</v-list-item-content>
+                      </v-list-item>
+                    </v-list>
+                  </v-card>
+                </v-col>
+              </v-row>
+            </template>
+          </v-data-iterator>
+          <v-data-iterator
+            :items="enemyShips"
+            hide-default-footer
+          >
+            <template v-slot:header>
+              <v-toolbar
+                class="mb-2"
+                color="indigo darken-5"
+                dark
+                flat
+                dense
+                small
+              >
+              <v-toolbar-title>Enemy Ships</v-toolbar-title>
+              </v-toolbar>
+            </template>
+            <template v-slot:default="props">
+              <v-row>
+                <v-col
+                  v-for="item in props.items"
+                  :key="item.name"
+                  cols="12"
+                  sm="12"
+                  md="6"
+                  lg="6"
+                >
+                  <v-card>
+                    <v-card-title class="subheading font-weight-bold">ID: {{ item.id }}</v-card-title>
+      
+                    <v-divider></v-divider>
+      
+                    <v-list dense small>
+                      <v-list-item>
+                        <v-list-item-content>x, y:</v-list-item-content>
+                        <v-list-item-content class="align-end">{{ item.x }}, {{item.y}} </v-list-item-content>
+                      </v-list-item>
+      
+                      <v-list-item>
+                        <v-list-item-content>vx, vy:</v-list-item-content>
+                        <v-list-item-content class="align-end">{{ item.vx}}, {{ item.vy }}</v-list-item-content>
+                      </v-list-item>
+      
+                      <v-list-item>
+                        <v-list-item-content>Energy:</v-list-item-content>
+                        <v-list-item-content class="align-end">{{ item.params.energy }}</v-list-item-content>
+                      </v-list-item>
+      
+                      <v-list-item>
+                        <v-list-item-content>Laser Power:</v-list-item-content>
+                        <v-list-item-content class="align-end">{{ item.params.laser_power }}</v-list-item-content>
+                      </v-list-item>
+      
+                      <v-list-item>
+                        <v-list-item-content>Cooling Rate:</v-list-item-content>
+                        <v-list-item-content class="align-end">{{ item.params.cooling_rate }}</v-list-item-content>
+                      </v-list-item>
+      
+                      <v-list-item>
+                        <v-list-item-content>Soul:</v-list-item-content>
+                        <v-list-item-content class="align-end">{{ item.params.soul }}</v-list-item-content>
+                      </v-list-item>
+      
+                      <v-list-item>
+                        <v-list-item-content>Temp:</v-list-item-content>
+                        <v-list-item-content class="align-end">{{ item.temp }}</v-list-item-content>
+                      </v-list-item>
+                    </v-list>
+                  </v-card>
+                </v-col>
+              </v-row>
+            </template>
+          </v-data-iterator>
+          </v-list>
+        </v-navigation-drawer> 
+        <v-container fluid>
+            <vue-p5 v-on="this"
+            @mouseClicked="mouseClicked"
+            ></vue-p5>
+              <div>
+                <v-btn @click="onClickBack()">Back</v-btn>
+                <v-btn :disabled="autoPlaying" @click="onClickPlay()">Play</v-btn>
+                <v-btn :disabled="isLastState" @click="onClickNext()">Next</v-btn>
+              </div>
+            <v-row>
+            <v-textarea
+              :disabled="calcWaiting"
+              v-model="gameStateListJson"
+              name="input-7-4"
+              label="Game State"
+            >
+            </v-textarea> 
+            </v-row>
+        </v-container>
+        </v-main>
+    </v-app>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/vue@2.x/dist/vue.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script src="https://unpkg.com/vue-p5"></script>
+
+  
+  <script>
+    POST_ENDPOINT = "http://127.0.0.1:5000/interact"
+    
+    new Vue({
+      el: '#app',
+      vuetify: new Vuetify(),
+      data: {
+        updateUrl: false,
+        autoPlaying: false,
+        playingIntervalId: undefined,
+        calcWaiting: false,
+        pixelHeight: 800,
+        pixelWidth: 1200,
+        colors: [
+          [240,100,100, 0.9],
+          [100,150,240, 0.9],
+          [240,240,10, 0.5],
+          [240,140,100, 0.8],
+          [255,100,200, 0.8],
+        ],
+        currentStateIndex: 0,
+        gameStateList: [
+          {
+            game_stage: 1,
+            current_turn: 1,
+            my_syde: 1,
+            my_ships: [
+              {
+                id: 0,
+                side: 0,
+                x: -10,
+                y: 0,
+                vx: 1,
+                vy: 1,
+                params: {
+                  energy: 1,
+                  laser_power: 1,
+                  cooling_rate: 1,
+                  soul: 1,
+                },
+                temp: 1,
+                commands: []
+              }
+            ],
+            enemy_ships: [
+              {
+                id: 1,
+                side: 0,
+                x: 10,
+                y: 0,
+                vx: -1,
+                vy: -1,
+                params: {
+                  energy: 1,
+                  laser_power: 1,
+                  cooling_rate: 1,
+                  soul: 1,
+                },
+                temp: 1,
+                commands: []
+              }
+            ],
+          },
+          {
+            game_stage: 1,
+            current_turn: 2,
+            my_syde: 1,
+            my_ships: [
+              {
+                id: 0,
+                side: 0,
+                x: -10,
+                y: -1,
+                vx: 1,
+                vy: 1,
+                params: {
+                  energy: 1,
+                  laser_power: 1,
+                  cooling_rate: 1,
+                  soul: 1,
+                },
+                temp: 1,
+                commands: [
+                  {
+                    kind: 1,
+                    v: 20,
+                  },
+                  {
+                    kind: 0,
+                    x: 0,
+                    y: -1,
+                  },
+                  {
+                    kind: 2,
+                    x: 10,
+                    y: 10,
+                    v: 10,
+                    p2: 10,
+                  }
+                ]
+              }
+            ],
+            enemy_ships: [
+              {
+                id: 1,
+                side: 0,
+                x: 10,
+                y: 1,
+                vx: -1,
+                vy: -1,
+                params: {
+                  energy: 1,
+                  laser_power: 1,
+                  cooling_rate: 1,
+                  soul: 1,
+                },
+                temp: 1,
+                commands: []
+              }
+            ],
+          },
+      ],
+        inputData: [0,0]
+      },
+      mounted(){
+      },
+      computed:{
+        gameStateListJson: {
+          get(){
+            return JSON.stringify(this.gameStateList)
+          },
+          set(json){
+            
+            try {
+              this.gameStateList = JSON.parse(json)
+            } catch (e) {
+              console.error(e)
+            }
+          }
+        },
+        currentGameState(){
+          return this.gameStateList[this.currentStateIndex]
+        },
+        myShips(){
+          return this.currentGameState.my_ships
+        },
+        enemyShips(){
+          return this.currentGameState.enemy_ships
+        },
+        ships(){
+          return [...this.enemyShips, ...this.myShips]
+        },
+        dotSize() {
+          const xCnt =this.pixelWidth/this.gridWidth
+          const yCnt =this.pixelHeight/this.gridHeight
+          return xCnt > yCnt ? yCnt : xCnt;
+        },
+        isLastState(){
+          return this.gameStateList.length == (this.currentStateIndex + 1)
+        },
+        gridHeight() {
+          return this.maxPMinP[1] - this.maxPMinP[3] + 1
+        },
+        gridWidth() {
+          return this.maxPMinP[0] - this.maxPMinP[2] + 1
+        },
+        maxPMinP() {
+          let max_x = 128
+          let max_y = 128
+          let min_x = -128
+          let min_y = -128
+          this.ships.forEach( s=> {
+            max_x = max_x > s.x ? max_x : s.x
+            max_y = max_y > s.y ? max_y : s.y
+            min_x = min_x < s.x ? min_x : s.x
+            min_y = min_y < s.y ? min_y : s.y
+          });
+          return [max_x,max_y, min_x, min_y]
+        }
+      },
+      methods: {
+        toStrCol(color){
+          return `rgba(${color.join(',')})`
+        },
+        async onClickPost(){
+        },
+        setup(sketch) {
+          sketch.resizeCanvas(this.pixelWidth, this.pixelHeight);
+          sketch.noStroke();
+        },
+        vectorToPixelPoint( [x,y]) {
+          return [ (x-this.maxPMinP[2]) *this.dotSize, (y-this.maxPMinP[3]) *this.dotSize ]
+        },
+        pixelPointToVector([x,y]) {
+          return [ Math.floor(x /this.dotSize) + this.maxPMinP[2], Math.floor(y/this.dotSize) + this.maxPMinP[3]]
+        },
+        onClickBack(){
+          this.autoPlaying = false
+          if (this.currentStateIndex !== 0) {
+            this.currentStateIndex -=1
+          }
+        },
+        onClickNext(){
+          if (!this.isLastState) {
+            this.currentStateIndex +=1
+          } else {
+            this.autoPlaying = false
+            if(this.playingIntervalId) {
+              clearInterval(this.playingIntervalId);
+              this.playingIntervalId = undefined;
+            }
+          } 
+        },
+        onClickPlay(){
+          if(this.isLastState) {
+            this.currentStateIndex = 0
+          }
+          this.autoPlaying = true
+          this.playingIntervalId = window.setInterval( () => {this.onClickNext()}, 300);
+        },
+        draw(sk) {
+            sk.background((25,25,25));
+            this.drawShips(sk)
+        },
+        drawShip(sk, ship){
+            const shipSize = 5
+            const size = shipSize * this.dotSize
+            const offset = (shipSize-1)/2
+            sk.rect(
+              ...this.vectorToPixelPoint( [ship.x - offset, ship.y - offset]),
+              size,
+              size,
+            )
+            sk.fill(255,255,255)
+            sk.rect(
+              ...this.vectorToPixelPoint( [ship.x, ship.y]),
+              this.dotSize,
+              this.dotSize,
+            )
+          this.drawCommands(sk,ship)
+        },
+        drawCommands(sk, ship){
+          const commands = ship.commands
+          commands.forEach(command => {
+            if(command.kind === 0) {
+              this.drawAccel(sk, ship, command)
+            } else if(command.kind === 1) {
+              this.drawSuicide(sk, ship, command)
+            } else if(command.kind === 2) {
+              this.drawLaser(sk, ship, command)
+            }
+          });
+        },
+        drawSuicide(sk,ship, suicide){
+          // 範囲
+          sk.fill(this.toStrCol(this.colors[2]))
+          const explosionSize = 10
+          const size = explosionSize * this.dotSize
+          const offset = (explosionSize-1)/2
+          sk.rect(
+            ...this.vectorToPixelPoint( [ship.x - offset, ship.y - offset]),
+            size,
+            size,
+          )
+        },
+        drawAccel(sk,ship, accel){
+          // 範囲
+          sk.stroke(this.toStrCol(this.colors[3]))
+          sk.strokeWeight(this.dotSize)
+          sk.line(
+            ...this.vectorToPixelPoint([ship.x + accel.x*3, ship.y + accel.y*3]),
+            ...this.vectorToPixelPoint([ship.x + accel.x*6, ship.y + accel.y*6]),
+          );
+          sk.noStroke()
+        },
+        drawLaser(sk,ship,laser){
+          // 範囲
+          sk.stroke(this.toStrCol(this.colors[4]))
+          sk.strokeWeight(this.dotSize)
+          sk.line(
+            ...this.vectorToPixelPoint([ship.x, ship.y]),
+            ...this.vectorToPixelPoint([laser.x, laser.y]),
+          );
+          sk.noStroke()
+        },
+        drawShips(sk){
+          const myColor = this.colors[0]
+          this.myShips.forEach( ship => {
+            sk.fill(this.toStrCol(myColor))
+            this.drawShip(sk, ship)
+          });
+
+          const enemyColor = this.colors[1]
+          this.enemyShips.forEach( ship => {
+            sk.fill(this.toStrCol(enemyColor))
+            this.drawShip(sk, ship)
+          });
+        },
+        mouseClicked(sk) {
+        },
+      },
+    })
+  </script>
+</body>
+</html>
