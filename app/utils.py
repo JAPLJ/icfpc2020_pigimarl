@@ -17,19 +17,15 @@ def laser_damage(atk_ship_x, atk_ship_y, target_x, target_y, laser_power):
     return abs(v)
 
 def next_pos(planet_r, gravity_r, x, y, vx, vy):
-    """
-    accelしない仮定して、次ターンの場所・速度を計算する
-    """
-    if max(abs(x), abs(y)) <= gravity_r:
-        if abs(x) <= abs(y):
-            if y > 0:
-                vy -= 1
-            elif y < 0:
-                vy += 1
-        if abs(y) <= abs(x):
-            if x > 0:
-                vx -= 1
-            elif x < 0:
-                vx += 1
+    if abs(x) <= abs(y):
+        if y > 0:
+            vy -= 1
+        elif y < 0:
+            vy += 1
+    if abs(y) <= abs(x):
+        if x > 0:
+            vx -= 1
+        elif x < 0:
+            vx += 1
     x, y = x + vx, y + vy
     return (x, y, vx, vy)
