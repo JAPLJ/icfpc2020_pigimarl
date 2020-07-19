@@ -19,7 +19,8 @@ class Escaper:
         ship = state.my_ships[0]
 
         if self.into_orbit_moves is None:
-            self.into_orbit_moves = utils.go_into_orbit(state.planet_radius, ship.x, ship.y, ship.vx, ship.vy)
+            self.into_orbit_moves = utils.go_into_orbit(
+                state.planet_radius, state.gravity_radius, ship.x, ship.y, ship.vx, ship.vy)
 
         if len(self.into_orbit_moves) > 0:
             acc = self.into_orbit_moves.pop(0)
@@ -41,7 +42,8 @@ class Escaper:
                 a_range = range(-ship.max_accel, ship.max_accel + 1)
                 for ax, ay in product(a_range, a_range):
                     moves = [(ax, ay)]
-                    if utils.gravity_check(state.planet_radius, ship.x, ship.y, ship.vx, ship.vy, moves):
+                    if utils.gravity_check(state.planet_radius, state.gravity_radius,
+                                           ship.x, ship.y, ship.vx, ship.vy, moves):
                         acc = (ax, ay)
                 if acc:
                     commands.append({'command': 'accel', 'x': acc[0], 'y': acc[1]})
