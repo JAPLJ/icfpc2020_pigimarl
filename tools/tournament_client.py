@@ -115,8 +115,12 @@ def main():
     json_log_path = None if len(sys.argv) < 4 else sys.argv[3]
 
     # sys.setrecursionlimit(1000000)
-    import test_ai
-    run(server_url, player_key, test_ai.TestAI(), json_log_path=json_log_path)
+    from multiship import Multiship, ShipAIInfo, MainShipAI
+
+    attacker = ShipAIInfo(MainShipAI(), 100, 0, 0, 2)
+    defender = ShipAIInfo(MainShipAI(), 100, 0, 0, 2)
+
+    run(server_url, player_key, Multiship(attacker, defender), json_log_path=json_log_path)
 
 
 if __name__ == '__main__':
