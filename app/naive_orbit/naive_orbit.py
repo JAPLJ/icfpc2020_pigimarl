@@ -16,6 +16,7 @@ class NaiveOrbit:
         myship = state.my_ships[0]
         x = myship.x
         y = myship.y
+        print(x, y)
         ship_id = myship.id
         energy = myship.params.energy
         if energy < 16:
@@ -24,7 +25,7 @@ class NaiveOrbit:
         # (x, y) とは直行する方向に進むし
         to_x = -y
         to_y = +x
-        theta = math.atan2(to_y, to_x)
+        theta = math.degrees(math.atan2(to_y, to_x))
         dx, dy = self._calc_direction(theta)
         command = {
             'command': 'accel',
