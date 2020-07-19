@@ -114,7 +114,7 @@ def main():
     import drop_the_bomb
 
     rotating = rotating_ai.RotatingAI()
-    dtb = drop_the_bomb.DropTheBomb()
+    dtb = drop_the_bomb.DropThe2Bombs()
 
     run(server_url, player_key, dtb, json_log_path=json_log_path)
 
