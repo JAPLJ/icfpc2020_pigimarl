@@ -98,11 +98,10 @@ def main():
 
     class Solver:
         def action(self, state):
-            def action(self, state):
-                commands = {}
-                for ship in state.my_ships:
-                    commands[ship.id] = [{'command': 'suicide'}]
-                return commands
+            commands = {}
+            for ship in state.my_ships:
+                commands[ship.id] = [{'command': 'suicide'}]
+            return commands
 
         def set_specs(self, limit, side):
             return ShipParameter(1, 1, 1, 1)
