@@ -1,10 +1,6 @@
 # AI 側が受け取るステートや、返すコマンド達のデータ型の定義
 
 import dataclasses
-<<<<<<< HEAD
-# from dataclasses_json import dataclass_json
-=======
->>>>>>> master
 from typing import List
 
 from common_interface import *
