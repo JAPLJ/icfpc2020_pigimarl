@@ -1,3 +1,5 @@
+import random
+
 def laser_damage(atk_ship_x, atk_ship_y, target_x, target_y, laser_power):
     """
     (atk_ship_x, atk_ship_y) から(target_x, target_y)に対してレーザーを射出して、その地点へ与えるダメージ。
@@ -58,7 +60,10 @@ def go_into_orbit(planet_r, gravity_r, x0, y0, vx0, vy0):
     """
     ln = 1
     while True:
-        for d in range(8):
+        p = list(range(8))
+        random.shuffle(p)
+        for i in range(8):
+            d = p[i]
             dx, dy = DX[d], DY[d]
             ms = [(dx, dy) for i in range(ln)]
             if gravity_check(planet_r, gravity_r, x0, y0, vx0, vy0, ms):
