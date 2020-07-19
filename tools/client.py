@@ -1,6 +1,7 @@
 import requests
 import sys
 
+from annotate_picture import *
 from cons_list import *
 from galaxy_lazy import LazyGalaxy
 from mod_dem import *
@@ -18,7 +19,7 @@ def main():
     interact(server_url, pictures_path, galaxy)
 
 
-def interact(server_url, pictures_path, galaxy, initial_data=(1, ((3, None), (0, (None, None)))), initial_res=(0, 0)):
+def interact(server_url, pictures_path, galaxy, initial_data=None, initial_res=(0, 0)):
     """
     初期データと初期レスポンスを元に、Galaxy の実行およびサーバーとの通信を行い、最終的に画像を出力する。
     :param server_url: サーバー URL
@@ -81,8 +82,19 @@ def draw_pictures(pictures_path, pictures_cons_list):
     """
     pictures = cons_list_to_python_list(pictures_cons_list)
     plot_vectors_list = [cons_list_to_python_list(picture) for picture in pictures]
-    print('[Draw] Pictures:', plot_vectors_list)
+    annotation_lists = [annotate_picture(vectors) for vectors in plot_vectors_list]
+
+    # print('[Draw] Pictures:', plot_vectors_list)
+
+    for i, annotations in enumerate(annotation_lists, start=1):
+        if len(annotations) > 0:
+            print(f'[Draw] Picture #{i} has {len(annotations)} annotations:')
+            for anno in annotations:
+                print(f"val = {anno.val}, box = (({anno.min_x}, {anno.min_y}), ({anno.max_x}, {anno.max_y}))")
+
     multipul_draw(plot_vectors_list, output_dir=pictures_path)
+    multipul_draw(plot_vectors_list, output_dir=pictures_path, annotation_lists=annotation_lists,
+                  filename_suffix='anno')
 
 
 if __name__ == '__main__':

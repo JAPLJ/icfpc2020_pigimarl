@@ -28,16 +28,19 @@ class App:
 
 
 def ev(v):
-    while isinstance(v, Thunk):
-        v0 = v
-        if v.done:
-            v = v.cache
-        else:
-            v = v.v()
-        if isinstance(v, App):
-            v = peel(ev(v.fn))(v.arg)
-        v0.done = True
-        v0.cache = v
+    if isinstance(v, Thunk):
+        vs = []
+        while isinstance(v, Thunk):
+            vs.append(v)
+            if v.done:
+                v = v.cache
+            else:
+                v = v.v()
+            if isinstance(v, App):
+                v = peel(ev(v.fn))(v.arg)
+        for v0 in vs:
+            v0.done = True
+            v0.cache = v
     return v
 
 

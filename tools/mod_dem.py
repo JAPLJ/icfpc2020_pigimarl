@@ -5,7 +5,11 @@ def dec(s):
         if s[k:k + 2] == '11':  # cons
             (h, k) = dec_inner(s, k + 2)
             (t, k) = dec_inner(s, k)
-            return ([h] + t, k)
+            if type(t) is not list:
+                # nil なし対応
+                return ([h] + [t], k)
+            else:
+                return ([h] + t, k)
         elif s[k:k + 2] == '00':  # nil
             return ([], k + 2)
         else:
