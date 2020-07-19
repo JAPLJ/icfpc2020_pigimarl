@@ -67,7 +67,7 @@ def convert_ships(resp):
                 r.p1, r.p2, r.p3, r.p4 = rc[1]
             cmds.append(r)
         ships[side].append(Ship(id=id, side=side, x=x, y=y, vx=vx, vy=vy, params=params, temp=temp,
-                                max_temp=temp, max_accel=max_accel, commands=cmds))
+                                max_temp=max_temp, max_accel=max_accel, commands=cmds))
     return ships
 
 
