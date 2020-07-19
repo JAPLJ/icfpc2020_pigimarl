@@ -1,3 +1,4 @@
+from dataclasses import asdict
 import requests
 import sys
 from requests.exceptions import Timeout
@@ -19,8 +20,8 @@ def run(server_url, player_key, attacker_solver, defender_solver=None, json_log_
         set_specs func(limit: int, side: int) -> ShipParameter
 
     """
-    # json_logging = json_log_path is not None
-    # json_logs = []
+    json_logging = json_log_path is not None
+    json_logs = []
 
     print('[RUNNER] join game')
     req_join = make_req_join(player_key)
@@ -34,23 +35,23 @@ def run(server_url, player_key, attacker_solver, defender_solver=None, json_log_
     print('[RUNNER] start game, parameter:', ship_parameter.list())
     req_start = make_req_start(player_key, ship_parameter)
     state = send(server_url, req_start)
-    # if json_logging:
-    #     json_logs.append(state.to_json())
+    if json_logging:
+        json_logs.append(asdict(state))
 
     while True:
         commands = solver.action(state)
         print('[RUNNER] send commands:', commands)
         req_commands = make_req_commands(player_key, commands)
         state = send(server_url, req_commands)
-        # if json_logging:
-        #     json_logs.append(state.to_json())
+        if json_logging:
+            json_logs.append(asdict(state))
 
         if state.game_stage == GameStage.FINISHED:
             break
     
-    # if json_logging:
-    #     with open(json_log_path, 'w') as f:
-    #         f.write(f'[{",".join(json_logs)}]')
+    if json_logging:
+        with open(json_log_path, 'w') as f:
+            f.write(f'[{",".join(json_logs)}]')
 
     print('[RUNNER] game finished')
 

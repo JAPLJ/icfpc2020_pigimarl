@@ -16,3 +16,16 @@ def laser_damage(atk_ship_x, atk_ship_y, target_x, target_y, laser_power):
     v = max(0, v0 - (vmax * 2 * y // d))
     return abs(v)
 
+def next_pos(planet_r, gravity_r, x, y, vx, vy):
+    if abs(x) <= abs(y):
+        if y > 0:
+            vy -= 1
+        elif y < 0:
+            vy += 1
+    if abs(y) <= abs(x):
+        if x > 0:
+            vx -= 1
+        elif x < 0:
+            vx += 1
+    x, y = x + vx, y + vy
+    return (x, y, vx, vy)
