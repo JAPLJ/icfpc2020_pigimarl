@@ -27,6 +27,7 @@ class Ship:
     params: ShipParameter
     temp: int
     max_temp: int
+    max_accel: int
     commands: List[ResponseCommand]
 
 @dataclasses.dataclass
