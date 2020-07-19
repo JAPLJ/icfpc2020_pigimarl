@@ -61,7 +61,7 @@ def actions_to_commands(actions):
     res = []
     for ship_id in actions:
         for cmd in actions[ship_id]:
-            if cmd['command'] == 'move':    # 推進
+            if cmd['command'] == 'accel':    # 推進
                 res.append([0, ship_id, [-cmd['x'], -cmd['y']]])
             elif cmd['command'] == 'suicide':   # 自爆
                 res.append([1, ship_id])
