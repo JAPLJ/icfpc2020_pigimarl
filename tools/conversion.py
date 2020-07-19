@@ -42,14 +42,29 @@ def convert_ships(resp):
     """ふね変換くん"""
     ships = [[], []]
     for ship in resp:
-        (ship_info, _) = ship   # commands: unsupported
+        (ship_info, rcmds) = ship
         side = ship_info[0]
         id = ship_info[1]
         (x, y) = ship_info[2]
         (vx, vy) = ship_info[3]
         params = ShipParameter(*ship_info[4])
         temp = ship_info[5]
-        ships[side].append(Ship(id=id, side=side, x=x, y=y, vx=vx, vy=vy, params=params, temp=temp))
+        cmds = []
+        for rc in rcmds:
+            r = ResponseCommand()
+            r.kind = rc[0]
+            if r.kind == 0:  # 推進
+                r.x, r.y = rc[1][0], rc[1][1]
+            elif r.kind == 1:   # 自爆
+                r.v = rc[1]
+            elif r.kind == 2:   # LASER
+                r.x, r.y = rc[1][0], rc[1][1]
+                r.p2 = rc[2]
+                r.v = rc[3]
+            elif r.kind == 3:   # 分裂
+                r.p1, r.p2, r.p3, r.p4 = rc[1]
+            cmds.append(r)
+        ships[side].append(Ship(id=id, side=side, x=x, y=y, vx=vx, vy=vy, params=params, temp=temp, commands=cmds))
     return ships
 
 
