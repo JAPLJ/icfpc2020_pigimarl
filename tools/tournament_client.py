@@ -7,6 +7,9 @@ from mod_dem import *
 from common_interface import *
 from conversion import *
 
+sys.path.append('app')
+from attack_eto.ai import *
+
 API_KEY = 'c16bab7da69d411da59ce8227e5d9034'
 
 def run(server_url, player_key, attacker_solver, defender_solver=None, json_log_path=None):
@@ -118,7 +121,7 @@ def main():
         def set_specs(self, limit, side):
             return ShipParameter(1, 1, 1, 1)
 
-    solver = Solver()
+    solver = AI()
 
     run(server_url, player_key, solver, json_log_path=json_log_path)
 
