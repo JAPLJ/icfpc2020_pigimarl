@@ -25,4 +25,4 @@ class State:
     current_turn: int
     my_side: Side
     my_ships: List[Ship]
-    enemy_shps: List[Ship]
+    enemy_ships: List[Ship]
