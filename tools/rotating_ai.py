@@ -25,17 +25,16 @@ def laser_damage(atk_ship_x, atk_ship_y, target_x, target_y, laser_power):
 
 
 def next_pos(planet_r, gravity_r, x, y, vx, vy):
-    if max(abs(x), abs(y)) <= gravity_r:
-        if abs(x) <= abs(y):
-            if y > 0:
-                vy -= 1
-            elif y < 0:
-                vy += 1
-        if abs(y) <= abs(x):
-            if x > 0:
-                vx -= 1
-            elif x < 0:
-                vx += 1
+    if abs(x) <= abs(y):
+        if y > 0:
+            vy -= 1
+        elif y < 0:
+            vy += 1
+    if abs(y) <= abs(x):
+        if x > 0:
+            vx -= 1
+        elif x < 0:
+            vx += 1
     x, y = x + vx, y + vy
     return (x, y, vx, vy)
 
@@ -47,7 +46,7 @@ def gravity_check(planet_r, gravity_r, x0, y0, vx0, vy0, moves):
         if i < len(moves):
             vx, vy = vx + moves[i][0], vy + moves[i][1]
         (x, y, vx, vy) = next_pos(planet_r, gravity_r, x, y, vx, vy)
-        if max(abs(x), abs(y)) <= planet_r:
+        if max(abs(x), abs(y)) <= planet_r or max(abs(x), abs(y)) > gravity_r:
             return False
     return True
 
