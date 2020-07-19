@@ -18,6 +18,8 @@ class Escaper:
     def finc_valid_acc(self, ship, planet_radius, gravity_radius):
         a_range = range(-ship.max_accel, ship.max_accel + 1)
         for ax, ay in product(a_range, a_range):
+            if (ax, ay) == (0, 0):
+                continue
             moves = [(ax, ay)]
             if utils.gravity_check(state.planet_radius, state.gravity_radius,
                                    ship.x, ship.y, ship.vx, ship.vy, moves, self.CHECK_TURN):
