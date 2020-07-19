@@ -8,35 +8,47 @@ from ai_interface import Ship, State
 
 
 class NaiveOrbit:
-    def __init__(self, cool=16):
+    def __init__(self, cool=8):
         self.cool = cool
 
     def action(self, state: State) -> Dict[int, List[dict]]:
-        # 分裂しないっす
-        myship = state.my_ships[0]
-        x = myship.x
-        y = myship.y
-        print(x, y)
-        ship_id = myship.id
-        energy = myship.params.energy
-        if energy < 16:
-            return {ship_id: []}
+        all_commands = {}
+        for myship in state.my_ships:
+            commands = []
+            x = myship.x
+            y = myship.y
+            params = myship.params
+            print(myship)
+            print(params)
+            print(state)
+            if params.soul > 1:
+                command = {
+                    'command': 'split',
+                    'p1': params.energy//2,
+                    'p2': 0,
+                    'p3': params.cooling_rate//2,
+                    'p4': params.soul//2,
+                }
+                commands.append(command)
+            elif state.current_turn % 2:
+                # (x, y) とは直行する方向に進むし
+                to_x = -y
+                to_y = +x
+                theta = math.degrees(math.atan2(to_y, to_x))
+                dx, dy = self._calc_direction(theta)
+                command = {
+                    'command': 'accel',
+                    'x': dx,
+                    'y': dy
+                }
+                commands.append(command)
+            all_commands[myship.id] = commands
 
-        # (x, y) とは直行する方向に進むし
-        to_x = -y
-        to_y = +x
-        theta = math.degrees(math.atan2(to_y, to_x))
-        dx, dy = self._calc_direction(theta)
-        command = {
-            'command': 'accel',
-            'x': dx,
-            'y': dy
-        }
-        return {ship_id: [command]}
+        return all_commands
 
     def set_specs(self, limit: int, side: int) -> ShipParameter:
-        energy = limit - 12*self.cool - 2
-        return ShipParameter(energy, 0, self.cool, 1)
+        energy = limit - 12*self.cool - 2*4
+        return ShipParameter(energy, 0, self.cool, 4)
 
     def _calc_direction(self, theta):
         # theta方向に向いた加速先を得る
