@@ -37,6 +37,10 @@ class Missile:
         return commands
 
 
+# パラメータはこんな感じで
+# attacker = ShipAIInfo(MissileMan(), 512 - (12 * 8 + 2 * 128), 0, 8, 128)
+# defender = ShipAIInfo(MissileMan(), 448 - (12 * 8 + 2 * 128), 0, 8, 128)
+
 class MissileMan:
     def __init__(self):
         self.go_into_orbit_accels = None
