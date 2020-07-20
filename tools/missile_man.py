@@ -33,7 +33,7 @@ class Missile:
 
 class MissileMan:
     def __init__(self):
-        self.go_into_orbit_accels = None
+        self.go_into_orbit_accels = []
         self.turn = 0
 
     def action(self, state, ship):
