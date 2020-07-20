@@ -9,8 +9,7 @@ class AISelector:
     def select(self, side, limit, enemy_params) -> ShipAIInfo:
         if side == Side.ATTACK:
             # enemy_params is ShipParameter
-            #return ShipAIInfo(Sniper(), 128, 0, 10, 100)
-            return ShipAIInfo(SplitEscaper(), 128, 0, 10, 100)
+            return ShipAIInfo(Sniper(), 128, 0, 10, 100)
         else:
             # enemy_params is None
-            return ShipAIInfo(SplitEscaper(), 128, 0, 10, 100)
+            return ShipAIInfo(Sniper(), 128, 0, 10, 100)
