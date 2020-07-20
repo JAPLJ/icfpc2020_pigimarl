@@ -115,8 +115,14 @@ def main():
 
     # sys.setrecursionlimit(1000000)
     from ai_selector import AISelector
-
-    run(server_url, player_key, AISelector(), json_log_path=json_log_path)
+    
+    try:
+        run(server_url, player_key, AISelector(), json_log_path=json_log_path)
+    except:
+        import traceback
+        traceback.print_exc()
+        sys.stdout.flush()
+        sys.stderr.flush()
 
 
 if __name__ == '__main__':
