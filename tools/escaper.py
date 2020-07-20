@@ -94,24 +94,9 @@ class Escaper:
         return ShipParameter(limit - (12*self.COOL_RATE + 2*4), 0, self.COOL_RATE, 4)
 
 
-class DebrisBomb:
-    def __init__(self, mother_id):
-        self.mother_id = mother_id
+class DebrisEscaper:
+    def __init__(self):
+        pass
 
     def action(self, state, ship):
-        mother = None
-        for s in state.my_ships:
-            if s.id == self.mother_id:
-                mother = s
-
-        (nx, ny, _, _) = next_pos(ship.x, ship.y, ship.vx, ship.vy)
-        (mnx, mny, _, _) = next_pos(mother.x, mother.y, mother.vx, mother.vy)
-        if abs(nx -  mnx) <= 3 and abs(ny - mny) <= 3:
-            return []
-
-        for eship in state.enemy_ships:
-            (enx, eny, _, _) = next_pos(eship.x, eship.y, eship.vx, eship.vy)
-            if abs(nx - enx) <= 3 and abs(ny - eny) <= 3:
-                return [{'command': 'suicide'}]
-        
         return []
