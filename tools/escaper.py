@@ -11,10 +11,13 @@ class Escaper:
     COOL_RATE = 16
     CHECK_TURN = 15 # 今後このターンで墜落・範囲外にならないことを確認
     ESCAPE_DMG = 50 # これ以上のダメージ（温度増加含む）で回避行動を取る
+    DUPLICATION_TURN = 10
 
     def __init__(self):
         self.into_orbit_moves = None
         self.past_acc = (0, 0)
+        self.mother_id = None
+        self.duplication_cunt = self.DUPLICATION_TURN
 
     def finc_valid_acc(self, ship, planet_radius, gravity_radius):
         a_range = range(-ship.max_accel, ship.max_accel + 1)
@@ -45,7 +48,11 @@ class Escaper:
 
     def action(self, state):
         commands = []
-        ship = state.my_ships[0]
+        self.duplication_cunt -= 1
+        if self.mother_id is None:
+            self.mother_id = state.my_ships[0].id
+        for s in state.my_ships:
+            if s.id == self.mother_id:
         acc = (0, 0)
 
         if self.into_orbit_moves is None:
@@ -56,7 +63,7 @@ class Escaper:
             acc = self.into_orbit_moves.pop(0)
 
         elif not utils.gravity_check(state.planet_radius, state.gravity_radius,
-                                     ship.x, ship.y, ship.vx, ship.vy, [], self.CHECK_TURN):
+                                     ship.x, ship.y, ship.vx, ship.vy, [], left_time):
             acc = self.finc_valid_acc(ship, state.planet_radius, state.gravity_radius)
 
         else:
@@ -74,6 +81,9 @@ class Escaper:
                 a_range = range(-ship.max_accel, ship.max_accel + 1)
                 acc = self.finc_valid_acc(ship, state.planet_radius, state.gravity_radius)
 
+        if ship.params.soul >= 2 and self.duplication_cunt < 0:
+            res.append({'command': 'split', 'ship_ai_info': ShipAIInfo(DebrisBomb(ship.id), 0, 0, 0, 1)})
+
         if acc != (0, 0):
             commands.append({'command': 'accel', 'x': acc[0], 'y': acc[1]})
         self.past_acc = acc
@@ -81,4 +91,4 @@ class Escaper:
 
 
     def set_specs(self, limit, side):
-        return ShipParameter(limit - (12*self.COOL_RATE + 2*1), 0, self.COOL_RATE, 1)
+        return ShipParameter(limit - (12*self.COOL_RATE + 2*4), 0, self.COOL_RATE, 4)
