@@ -49,6 +49,7 @@ class SplitEscaper2:
     def action(self, state, ship):
         commands = []
         self.duplication_count -= 1
+        acc = (0, 0)
         left_time = MAX_TURNS - state.current_turn
 
         if self.into_orbit_moves is None:
