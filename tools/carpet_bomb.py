@@ -52,17 +52,26 @@ class CarpetBombMother:
                 res.append({'command': 'accel', 'x': nd[0], 'y': nd[1]})
         
         elif ship.params.soul >= 2:
-            res.append({'command': 'split', 'ship_ai_info': ShipAIInfo(DebrisBomb(), 0, 0, 0, 1)})
+            res.append({'command': 'split', 'ship_ai_info': ShipAIInfo(DebrisBomb(ship.id), 0, 0, 0, 1)})
 
         self.turn += 1
         return res
 
 
 class DebrisBomb:
-    def __init__(self):
-        pass
+    def __init__(self, mother_id):
+        self.mother_id = mother_id
 
     def action(self, state, ship):
+        mother = None
+        for ship in state.ships:
+            if ship.id == self.mother_id:
+                mother = ship
+
+        (mnx, mny, _, _) = next_pos(mother.x, mother.y, mother.vx, mother.vy)
+        if abs(nx -  mnx) <= 3 and abs(ny - mny) <= 3:
+            return []
+
         (nx, ny, _, _) = next_pos(ship.x, ship.y, ship.vx, ship.vy)
         for eship in state.enemy_ships:
             (enx, eny, _, _) = next_pos(eship.x, eship.y, eship.vx, eship.vy)
