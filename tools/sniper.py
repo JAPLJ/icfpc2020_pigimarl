@@ -8,10 +8,12 @@ from collections import defaultdict
 
 
 class Sniper:
-    def __init__(self):
+    def __init__(self, stalk_interval=20, stalk_max_energy=4):
         self.turn = 0
         self.orbit = None
         self.eship_accel_history = defaultdict(list)
+        self.stalk_interval = stalk_interval
+        self.stalk_max_energy = stalk_max_energy
 
     def action(self, state, ship):
         res = []
@@ -31,15 +33,16 @@ class Sniper:
         if self.orbit is None:
             self.orbit = go_into_orbit(state.gravity_radius, state.planet_radius, ship.x, ship.y, ship.vx, ship.vy)
 
-        # 軌道入りがまだなら入る
+        # 最初の軌道入りはもう終わっている and 燃料が残っている and ストーキングのタイミングが来た場合
+        if len(self.orbit) == 0 and ship.parameters.enemy > 0 and self.turn % self.stalk_interval == 0:
+            self.orbit = stalk(state.gravity_radius, state.planet_radius, ship.x, ship.y, ship.vx, ship.vy,
+                               min(100, 384 - self.turn), state.enemy_ships, self.stalk_max_energy)
+
+        # 軌道入りがまだなら入る or ストーキング開始
         if len(self.orbit) > 0:
             ms = self.orbit[0]
             res.append({'command': 'accel', 'x': ms[0], 'y': ms[1]})
             self.orbit = self.orbit[1:]
-        elif ship.params.energy > 0:
-            # もう軌道入りはしている
-            # もし追加で accel をしたいならここでやる
-            if
 
         # 撃つぜレーザー
         to_attack = None
@@ -68,6 +71,8 @@ class Sniper:
                 max_dmg = edmg
         if max_dmg > 0 and to_attack is not None:
             res.append(to_attack)
+
+        self.turn += 1
 
         return res
 
