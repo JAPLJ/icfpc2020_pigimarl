@@ -7,29 +7,30 @@ from cons_list import *
 from conversion import *
 from mod_dem import *
 
+from multiship import Multiship, ShipAIInfo
+
+
 API_KEY = 'c16bab7da69d411da59ce8227e5d9034'
 
 
-def run(server_url, player_key, attacker_solver, defender_solver=None, json_log_path=None):
+def run(server_url, player_key, ai_selector, json_log_path=None):
     """
     ゲームを一回分実行
-    sideに応じてsolverを使い分ける
-    使い分けの必要がない場合はdefender_solverを与えなくても良い
+    君だけの ai_selector: AISelector を作って最高の AI を選択しよう！
+
     solver:
         action func(State) -> Dict[int, List[Command]]
         set_specs func(limit: int, side: int) -> ShipParameter
-
     """
     json_logging = json_log_path is not None
     json_logs = []
 
     print('[RUNNER] join game')
     req_join = make_req_join(player_key)
-    (side, limit) = send(server_url, req_join)
+    (side, limit, enemy_params) = send(server_url, req_join)
 
-    solver = attacker_solver
-    if side == Side.DEFENSE and defender_solver is not None:
-        solver = defender_solver
+    ai_info = ai_selector.select(side, limit, enemy_params)
+    solver = Multiship(ai_info, ai_info)
 
     ship_parameter = solver.set_specs(limit, side)
     print('[RUNNER] start game, parameter:', ship_parameter.list())
@@ -115,13 +116,9 @@ def main():
     json_log_path = None if len(sys.argv) < 4 else sys.argv[3]
 
     # sys.setrecursionlimit(1000000)
-    from multiship import Multiship, ShipAIInfo
-    from ship_ai_example import MainShipAI
-
-    attacker = ShipAIInfo(MainShipAI(), 100, 0, 8, 100)
-    defender = ShipAIInfo(MainShipAI(), 100, 0, 8, 100)
-
-    run(server_url, player_key, Multiship(attacker, defender), json_log_path=json_log_path)
+    from ai_selector import AISelector
+    
+    run(server_url, player_key, AISelector(), json_log_path=json_log_path)
 
 
 if __name__ == '__main__':
