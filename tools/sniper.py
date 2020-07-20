@@ -34,7 +34,7 @@ class Sniper:
             self.orbit = go_into_orbit(state.gravity_radius, state.planet_radius, ship.x, ship.y, ship.vx, ship.vy)
 
         # 最初の軌道入りはもう終わっている and 燃料が残っている and ストーキングのタイミングが来た場合
-        if len(self.orbit) == 0 and ship.parameters.enemy > 0 and self.turn % self.stalk_interval == 0:
+        if len(self.orbit) == 0 and ship.params.energy > 0 and self.turn % self.stalk_interval == 0:
             self.orbit = stalk(state.gravity_radius, state.planet_radius, ship.x, ship.y, ship.vx, ship.vy,
                                min(100, 384 - self.turn), state.enemy_ships, self.stalk_max_energy)
 
