@@ -77,13 +77,51 @@ class CarpetBombMother:
             res.append({'command': 'accel', 'x': nd[0], 'y': nd[1]})
             self.orbit2 = self.orbit2[1:]
         
-        elif self.turn % 3 == 0 and ship.params.energy >= 1:
+        elif self.turn % 4 == 0 and ship.params.energy >= 1:
             nd = self._go_outer(state, ship)
             if nd is not None:
                 res.append({'command': 'accel', 'x': nd[0], 'y': nd[1]})
         
         elif ship.params.soul >= 2:
             res.append({'command': 'split', 'ship_ai_info': ShipAIInfo(DebrisBomb(ship.id), 0, 0, 0, 1)})
+        
+        if self.params.laser_power > 0:
+            max_dmg = 0
+            to_attack = None
+            target = None
+            for eship in state.enemy_ships:
+                if sum(eship.params.list()) == 0:
+                    continue
+            
+                pvx, pvy = 0, 0
+                for rc in eship.commands:
+                    if rc.kind == 0:
+                        pvx, pvy = -rc.x, -rc.y
+                
+                (nx, ny, _, _) = next_pos(eship.x, eship.y, eship.vx + pvx, eship.vy + pvy)
+                max_lp = min(ship.params.laser_power, ship.max_temp - ship.temp)
+                ldmg = laser_damage(ship.x, ship.y, nx, ny, max_lp)
+                edmg = ldmg - (eship.max_temp - eship.temp)
+                if edmg > 0:
+                    edmg += eship.params.soul * 100
+                
+                if edmg > max_dmg:
+                    target = eship
+                    to_attack = {'command': 'laser', 'x': nx, 'y': ny, 'power': max_lp}
+                    max_dmg = edmg
+
+            if max_dmg > 0:
+                lo, hi = 0, to_attack['power']
+                while hi - lo > 1:
+                    mid = (hi + lo) // 2
+                    ldmg = laser_damage(ship.x, ship.y, to_attack['x'], to_attack['y'], mid)
+                    edmg = ldmg - (eship.max_temp - eship.temp)
+                    if edmg >= sum(eship.params.list) == 0:
+                        hi = mid
+                    else:
+                        lo = mid
+                to_attack['power'] = min(to_attack['power'], hi + 5)
+                res.append(to_attack)
 
         self.turn += 1
         return res
