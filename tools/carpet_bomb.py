@@ -22,7 +22,7 @@ class CarpetBombMother:
         self.orbit2 = None
     
     def _go_outer(self, state, ship):
-        g = complex(ship.x, ship.y) * complex(1, 1)
+        g = complex(ship.vx, ship.vy)
         mcos = -1e10
         resd = None
         for d in range(8):
@@ -37,6 +37,23 @@ class CarpetBombMother:
 
     def action(self, state, ship):
         res = []
+
+        if self.turn == 0:
+            gx, gy = calc_gravity(ship.x, ship.y)
+            res.append({'command': 'accel', 'x': -gx, 'y': -gy})
+            self.turn += 1
+            return res
+        
+        if self.turn == 1:
+            e_move = None
+            for eship in state.enemy_ships:
+                for rc in eship.commands:
+                    if rc.kind == 0:
+                        e_move = (-rc.x, -rc.y)
+            if e_move is not None:
+                res.append({'command': 'accel', 'x': e_move[0], 'y': e_move[1]})
+                self.turn += 1
+                return res
 
         if self.orbit2 is None:
             self.orbit2 = go_into_orbit_2(state.planet_radius, state.gravity_radius, ship.x, ship.y, ship.vx, ship.vy)
