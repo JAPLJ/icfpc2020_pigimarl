@@ -9,41 +9,39 @@ from collections import defaultdict
 
 class Sniper:
     def __init__(self):
-        self.into_orbit = dict()
-        self.into_orbit_moves = dict()
-        self.into_orbit_moves_idx = dict()
+        self.turn = 0
+        self.orbit = None
         self.eship_accel_history = defaultdict(list)
-        self.turns = set()
 
     def action(self, state, ship):
         res = []
 
-        # ターンの最初の呼び出しだけ処理したい
-        if state.current_turn not in self.turns:
-            self.turns.add(state.current_turn)
-            for eship in state.enemy_ships:
-                if sum(eship.params.list()) == 0:
-                    # 死んでるし
-                    continue
-                rc_accel = [rc for rc in eship.commands if rc.kind == 0]
-                if len(rc_accel) == 0:
-                    self.eship_accel_history[eship.id].append((0, 0))
-                else:
-                    self.eship_accel_history[eship.id].append((rc_accel[0].x, rc_accel[0].y))
+        # 敵の accel ヒストリーを更新
+        for eship in state.enemy_ships:
+            if sum(eship.params.list()) == 0:
+                # 死んでるし
+                continue
+            rc_accel = [rc for rc in eship.commands if rc.kind == 0]
+            if len(rc_accel) == 0:
+                self.eship_accel_history[eship.id].append((0, 0))
+            else:
+                self.eship_accel_history[eship.id].append((rc_accel[0].x, rc_accel[0].y))
 
-        if ship.id not in self.into_orbit:
-            self.into_orbit[ship.id] = False
-            print('hoge', state.planet_radius, state.gravity_radius, ship.x, ship.y, ship.vx, ship.vy, file=sys.stderr)
-            self.into_orbit_moves[ship.id] = go_into_orbit(state.gravity_radius, state.planet_radius, ship.x, ship.y, ship.vx, ship.vy)
-            print('fuga', file=sys.stderr)
-            self.into_orbit_moves_idx[ship.id] = 0
+        # 最初の軌道入りへのルート計算がまだなら、計算する
+        if self.orbit is None:
+            self.orbit = go_into_orbit(state.gravity_radius, state.planet_radius, ship.x, ship.y, ship.vx, ship.vy)
 
-        if not self.into_orbit[ship.id]:
-            ms = self.into_orbit_moves[ship.id][self.into_orbit_moves_idx[ship.id]]
+        # 軌道入りがまだなら入る
+        if len(self.orbit) > 0:
+            ms = self.orbit[0]
             res.append({'command': 'accel', 'x': ms[0], 'y': ms[1]})
-            self.into_orbit_moves_idx[ship.id] += 1
-            self.into_orbit[ship.id] = self.into_orbit_moves_idx[ship.id] == len(self.into_orbit_moves[ship.id])
+            self.orbit = self.orbit[1:]
+        elif ship.params.energy > 0:
+            # もう軌道入りはしている
+            # もし追加で accel をしたいならここでやる
+            pass
 
+        # 撃つぜレーザー
         to_attack = None
         max_dmg = 0
         for eship in state.enemy_ships:
@@ -68,7 +66,7 @@ class Sniper:
             if edmg > max_dmg:
                 to_attack = {'command': 'laser', 'x': nx, 'y': ny, 'power': max_lp}
                 max_dmg = edmg
-        if edmg > 0 and to_attack is not None:
+        if max_dmg > 0 and to_attack is not None:
             res.append(to_attack)
 
         return res
