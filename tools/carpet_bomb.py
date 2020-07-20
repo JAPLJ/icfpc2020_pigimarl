@@ -50,10 +50,10 @@ class CarpetBombMother:
         return resd        
 
     def _go_outer(self, state, ship):
-        return self._go_to(ship.vx, ship.vy)
+        return self._go_to(state, ship, ship.vx, ship.vy)
     
     def _go_inner(self, state, ship):
-        return self._go_to(-ship.vx, -ship.vy)
+        return self._go_to(state, ship, -ship.vx, -ship.vy)
 
     def action(self, state, ship):
         res = []
@@ -83,7 +83,7 @@ class CarpetBombMother:
             res.append({'command': 'accel', 'x': nd[0], 'y': nd[1]})
             self.orbit2 = self.orbit2[1:]
         
-        elif self.turn % 3 == 0 and ship.params.energy >= 1:
+        elif self.turn % 5 == 0 and ship.params.energy >= 1:
             if ship.params.soul >= 2:
                 nd = self._go_outer(state, ship)
             else:
