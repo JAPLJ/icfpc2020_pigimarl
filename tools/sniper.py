@@ -4,6 +4,7 @@ from ai_interface import *
 import sys
 sys.path.append('app/')
 from utils import *
+from collections import defaultdict
 
 
 class Sniper:
@@ -11,6 +12,7 @@ class Sniper:
         self.into_orbit = dict()
         self.into_orbit_moves = dict()
         self.into_orbit_moves_idx = dict()
+        self.eship_accel_history = defaultdict(list)
 
     def action(self, state):
         res = dict()
@@ -37,11 +39,12 @@ class Sniper:
                     continue
 
                 pvx, pvy = 0, 0
-                # 次の一手が周期性から予測できる場合はそれを使い、そうでないなら最新のaccelのものを使う
-                next_command = guess_next(eship.commands)
-                if next_command:
-                    if next_command.kind == 0:
-                        pvx, pvy = -rc.x, -rc.y
+                # 次の一手が直近N手の周期性から予測できる場合はそれを使い、そうでないなら最新のaccelのものを使う
+                next_command = guess_next(self.eship_accel_history[eship.id][-2:])
+                print("HIST", self.eship_accel_history[eship.id])
+                if next_command is not None:
+                    print("PRED", next_command)
+                    pvx, pvy = -next_command[0], next_command[1]
                 else:
                     for rc in eship.commands:
                         if rc.kind == 0:
@@ -54,6 +57,13 @@ class Sniper:
                 if edmg > max_dmg:
                     to_attack = {'command': 'laser', 'x': nx, 'y': ny, 'power': max_lp}
                     max_dmg = edmg
+
+                rc_accel = [rc for rc in eship.commands if rc.kind == 0]
+                if len(rc_accel) == 0:
+                    self.eship_accel_history[eship.id].append((0, 0))
+                else:
+                    self.eship_accel_history[eship.id].append((rc_accel[0].x, rc_accel[0].y))
+
             if edmg > 0 and to_attack is not None:
                 res[ship.id].append(to_attack)
 
