@@ -108,8 +108,8 @@ class MissileMan:
                         {'command': 'split', 'ship_ai_info': ShipAIInfo(Missile(accels), len(accels), 0, 0, 1)})
             elif self.turn % 2 == 0:
                 if TURN - self.turn <= 20:
-                commands.append(
-                    {'command': 'split', 'ship_ai_info': ShipAIInfo(Mine(), 20, 0, 0, 1)})
+                    commands.append(
+                        {'command': 'split', 'ship_ai_info': ShipAIInfo(Mine(), 20, 0, 0, 1)})
 
         self.turn += 1
 
