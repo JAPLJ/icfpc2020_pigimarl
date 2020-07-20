@@ -29,7 +29,7 @@ class CarpetBombMother:
             nd = neighbours[d]
             if gravity_check(state.planet_radius, state.gravity_radius, ship.x, ship.y, ship.vx, ship.vy, [nd]):
                 nd = complex(nd[0], nd[1])
-                cos = (g * nd.conjugate()).real
+                cos = (g * nd.conjugate()).real / abs(nd)
                 if cos > mcos:
                     mcos = cos
                     resd = neighbours[d]
