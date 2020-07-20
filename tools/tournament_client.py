@@ -120,7 +120,7 @@ def main():
     from split_escaper2 import SplitEscaper2
 
     attacker = ShipAIInfo(MainShipAI(), 152, 0, 10, 120)
-    defender = ShipAIInfo(SplitEscaper2(), 128, 0, 10, 100)
+    defender = ShipAIInfo(SplitEscaper2(), 128, 0, 10, 10)
 
     run(server_url, player_key, Multiship(attacker, defender), json_log_path=json_log_path)
 
