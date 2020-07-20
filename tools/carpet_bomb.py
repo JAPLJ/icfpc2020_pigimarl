@@ -35,8 +35,8 @@ class CarpetBombMother:
         self.turn = 0
         self.orbit2 = None
     
-    def _go_outer(self, state, ship):
-        g = complex(ship.vx, ship.vy)
+    def _go_to(self, state, ship, to):
+        g = to
         mcos = -1e10
         resd = None
         for d in range(8):
@@ -47,7 +47,13 @@ class CarpetBombMother:
                 if cos > mcos:
                     mcos = cos
                     resd = neighbours[d]
-        return resd
+        return resd        
+
+    def _go_outer(self, state, ship):
+        return self._go_to(ship.vx, ship.vy)
+    
+    def _go_inner(self, state, ship):
+        return self._go_to(-ship.vx, -ship.vy)
 
     def action(self, state, ship):
         res = []
@@ -77,8 +83,11 @@ class CarpetBombMother:
             res.append({'command': 'accel', 'x': nd[0], 'y': nd[1]})
             self.orbit2 = self.orbit2[1:]
         
-        elif self.turn % 4 == 0 and ship.params.energy >= 1:
-            nd = self._go_outer(state, ship)
+        elif self.turn % 3 == 0 and ship.params.energy >= 1:
+            if ship.params.soul >= 2:
+                nd = self._go_outer(state, ship)
+            else:
+                nd = self._go_inner(state, ship)
             if nd is not None:
                 res.append({'command': 'accel', 'x': nd[0], 'y': nd[1]})
         
