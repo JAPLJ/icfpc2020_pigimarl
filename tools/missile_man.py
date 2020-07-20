@@ -50,20 +50,18 @@ class MissileMan:
                 for s in state.enemy_ships:
                     rot_sum += s.x * s.vy - s.y * s.vx
                 rot_sign = 1 if rot_sum > 0 else -1
-                self.go_into_orbit_accels = go_into_orbit(state.planet_radius, ship.x, ship.y, ship.vx, ship.vy,
+                self.go_into_orbit_accels = go_into_orbit(state.gravity_radius, state.planet_radius, ship.x, ship.y,
+                                                          ship.vx, ship.vy,
                                                           -rot_sign)
-                print('########################', self.go_into_orbit_accels)
-                print(ship.x, ship.y, ship.vx, ship.vy)
-                print(gravity_check(state.planet_radius, ship.x, ship.y, ship.vx, ship.vy, self.go_into_orbit_accels,
-                                    -rot_sign, True))
 
             if len(self.go_into_orbit_accels) > 0:
                 ax, ay = self.go_into_orbit_accels.pop(0)
                 commands.append({'command': 'accel', 'x': ax, 'y': ay})
-
-            if self.turn % 2 == 0:
+            elif self.turn % 2 == 0:
+                nx, ny, nvx, nvy = next_pos(ship.x, ship.y, ship.vx, ship.vy)
+                accels = go_into_orbit(state.gravity_radius, state.planet_radius, nx, ny, nvx, nvy)
                 commands.append(
-                    {'command': 'split', 'ship_ai_info': ShipAIInfo(Missile([random.choice(neighbours)]), 1, 0, 0, 1)})
+                    {'command': 'split', 'ship_ai_info': ShipAIInfo(Missile(accels), len(accels), 0, 0, 1)})
 
         self.turn += 1
 
