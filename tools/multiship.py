@@ -1,5 +1,3 @@
-from collections import defaultdict
-
 import sys
 
 sys.path.append('app/')
@@ -35,7 +33,7 @@ class Multiship:
         self.attacker_ship_ai_info = attacker_ship_ai_info
         self.defender_ship_ai_info = defender_ship_ai_info
         self.ship_id_to_ship_ai = {}
-        self.x_y_vx_vy_to_ship_ai_list = defaultdict(list)
+        self.par_ship_id_to_ship_ai = {}
 
     def set_specs(self, limit, side):
         if side == Side.ATTACK:
@@ -49,13 +47,23 @@ class Multiship:
                              initial_ship_ai_info.p4)
 
     def action(self, state):
-        res = {}
+        ship_id_to_ship = {}
+        for ship in state.my_ships:
+            ship_id_to_ship[ship.id] = ship
 
         for ship in state.my_ships:
             if ship.id not in self.ship_id_to_ship_ai:
-                ship_ai = self.x_y_vx_vy_to_ship_ai_list[(ship.x, ship.y, ship.vx, ship.vy)].pop()
-                self.ship_id_to_ship_ai[ship.id] = ship_ai
+                par_ship_id_opt = None
+                for par_ship_id in self.par_ship_id_to_ship_ai.keys():
+                    par_ship = ship_id_to_ship[ship.id]
+                    if (ship.x, ship.y, ship.vx, ship.vy) == (par_ship.x, par_ship.y, par_ship.vx, par_ship.vy):
+                        par_ship_id_opt = par_ship_id
+                self.ship_id_to_ship_ai[ship.id] = self.par_ship_id_to_ship_ai[par_ship_id_opt]
+                del self.par_ship_id_to_ship_ai[par_ship_id_opt]
 
+        res = {}
+
+        for ship in state.my_ships:
             ship_ai = self.ship_id_to_ship_ai[ship.id]
             print(ship.id, ship_ai)
 
@@ -77,12 +85,13 @@ class Multiship:
             for command in commands:
                 if command['command'] == 'split':
                     ship_ai_info = command['ship_ai_info']
+
                     command['p1'] = ship_ai_info.p1
                     command['p2'] = ship_ai_info.p2
                     command['p3'] = ship_ai_info.p3
                     command['p4'] = ship_ai_info.p4
-                    self.x_y_vx_vy_to_ship_ai_list[(ship.x + vx, ship.y + vy, vx, vy)].append(ship_ai_info.ship_ai)
+                    res[ship.id] = commands
 
-            res[ship.id] = commands
+                    self.par_ship_id_to_ship_ai[ship.id] = ship_ai_info.ship_ai
 
         return res

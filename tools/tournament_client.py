@@ -118,8 +118,8 @@ def main():
     from multiship import Multiship, ShipAIInfo
     from ship_ai_example import MainShipAI
 
-    attacker = ShipAIInfo(MainShipAI(), 100, 0, 0, 100)
-    defender = ShipAIInfo(MainShipAI(), 100, 0, 0, 100)
+    attacker = ShipAIInfo(MainShipAI(), 100, 0, 8, 100)
+    defender = ShipAIInfo(MainShipAI(), 100, 0, 8, 100)
 
     run(server_url, player_key, Multiship(attacker, defender), json_log_path=json_log_path)
 
