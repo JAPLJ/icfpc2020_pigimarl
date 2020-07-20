@@ -51,7 +51,7 @@ class MissileMan:
         print(f"[mother] p:{ship.params}\t t:{ship.temp}\t xy:{ship.x}, {ship.y}\t v:{ship.vx}, {ship.vy}")
         if sum([ship.params.energy, ship.params.laser_power, ship.params.cooling_rate, ship.params.soul]) == 0:
             print("もうだめ。。。")
-            return Missile().action(state, ship)
+            return Missile([]).action(state, ship)
         commands = []
 
         if ship.temp >= 64 and ship.params.soul >= 2:
