@@ -1,14 +1,14 @@
-from dataclasses import asdict
 import requests
 import sys
+from dataclasses import asdict
 from requests.exceptions import Timeout
 
 from cons_list import *
-from mod_dem import *
-from common_interface import *
 from conversion import *
+from mod_dem import *
 
 API_KEY = 'c16bab7da69d411da59ce8227e5d9034'
+
 
 def run(server_url, player_key, attacker_solver, defender_solver=None, json_log_path=None):
     """
@@ -48,12 +48,15 @@ def run(server_url, player_key, attacker_solver, defender_solver=None, json_log_
 
         if state.game_stage == GameStage.FINISHED:
             break
-    
+
     if json_logging:
+        import json
         with open(json_log_path, 'w') as f:
-            f.write(f'[{",".join(json_logs)}]')
+            f.write(json.dumps(json_logs))
+            # f.write(f'[{",".join(json_logs)}]')
 
     print('[RUNNER] game finished')
+
 
 def send(server_url, list_req):
     """
@@ -83,6 +86,7 @@ def send(server_url, list_req):
     print('[Send] res:', list_res)
     return parse_game_response(list_res)
 
+
 def parse_game_response(res):
     """
     GameResponseのlistをパースする
@@ -92,15 +96,18 @@ def parse_game_response(res):
 
 def make_req_join(player_key):
     # ただのlist（cons形式でない）を返す
-    return [2, player_key, []]
+    return [2, player_key, [103652820, 192496425430]]
+
 
 def make_req_start(player_key, ship_parameter):
     # ただのlist（cons形式でない）を返す
     return [3, player_key, ship_parameter.list()]
 
+
 def make_req_commands(player_key, commands):
     # ただのlist（cons形式でない）を返す
     return [4, player_key, actions_to_commands(commands)]
+
 
 def main():
     server_url = sys.argv[1]
@@ -108,20 +115,13 @@ def main():
     json_log_path = None if len(sys.argv) < 4 else sys.argv[3]
 
     # sys.setrecursionlimit(1000000)
+    from multiship import Multiship, ShipAIInfo
+    from ship_ai_example import MainShipAI
 
-    class Solver:
-        def action(self, state):
-            commands = {}
-            for ship in state.my_ships:
-                commands[ship.id] = [{'command': 'suicide'}]
-            return commands
+    attacker = ShipAIInfo(MainShipAI(), 100, 0, 8, 100)
+    defender = ShipAIInfo(MainShipAI(), 100, 0, 8, 100)
 
-        def set_specs(self, limit, side):
-            return ShipParameter(1, 1, 1, 1)
-
-    solver = Solver()
-
-    run(server_url, player_key, solver, json_log_path=json_log_path)
+    run(server_url, player_key, Multiship(attacker, defender), json_log_path=json_log_path)
 
 
 if __name__ == '__main__':

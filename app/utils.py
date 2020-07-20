@@ -1,3 +1,9 @@
+import random
+from collections import deque
+
+import numpy as np
+
+
 def sign(val):
     if val > 0:
         return 1
@@ -77,9 +83,87 @@ def go_into_orbit(planet_r, x0, y0, vx0, vy0):
     """
     ln = 1
     while True:
-        for d in range(8):
+        p = list(range(8))
+        random.shuffle(p)
+        for i in range(8):
+            d = p[i]
             dx, dy = DX[d], DY[d]
             ms = [(dx, dy) for i in range(ln)]
             if gravity_check(planet_r, x0, y0, vx0, vy0, ms):
                 return ms
         ln += 1
+
+
+# 8 近傍
+neighbours = [(-1, 0), (-1, -1), (0, -1), (1, -1), (1, 0), (1, 1), (0, 1), (-1, 1)]
+
+
+def move_to_target(gravity_r, planet_r, sx, sy, vx, vy, tx, ty):
+    """
+    現在位置が (sx, sy) で現在速度が (vx, vy) のときに (tx, ty) へ移動して静止するための最初の加速度を返す
+    注意: abs(vx) <= 1 かつ abs(vy) <= 1 でなければならない
+    :param gravity_r:
+    :param planet_r:
+    :param sx:
+    :param sy:
+    :param vx:
+    :param vy:
+    :param tx:
+    :param ty:
+    :return:
+    """
+    gr = gravity_r
+    gx, gy = calc_gravity(sx, sy)
+
+    if (sx, sy) == (tx, ty):  # 目標の座標に到達したら静止する
+        return -(vx + gx), -(vy + gy)
+
+    dist = np.full((gr * 2 + 1, gr * 2 + 1), 10 ** 9)
+    dist[tx + gr][ty + gr] = 0
+    q = deque()
+    q.append((tx, ty))
+
+    while len(q) > 0:
+        x, y = q.popleft()
+        if (x, y) == (sx, sy):
+            break
+
+        for dx, dy in neighbours:
+            nx = x + dx
+            ny = y + dy
+            if abs(nx) <= planet_r and abs(ny) <= planet_r:
+                continue
+            if abs(nx) <= gravity_r and abs(ny) <= gravity_r and dist[nx + gr][ny + gr] > dist[x + gr][y + gr] + 1:
+                dist[nx + gr][ny + gr] = dist[x + gr][y + gr] + 1
+                q.append((nx, ny))
+
+    for dx, dy in neighbours:
+        nx = sx + dx
+        ny = sy + dy
+        if abs(nx) <= gravity_r and abs(ny) <= gravity_r and dist[nx + gr][ny + gr] == dist[sx + gr][sy + gr] - 1:
+            ax = dx - (vx + gx)
+            ay = dy - (vy + gy)
+            if abs(ax) <= 2 and abs(ay) <= 2:
+                return ax, ay
+
+    return -(vx + gx), -(vy + gy)  # 一旦静止して次のターンに備える
+
+
+def stop(x, y, vx, vy):
+    '''
+    return tuple(int, int)
+    速度の絶対値が小さくなるような加速方向を返す
+    運が悪いとplanetに落ちる
+    '''
+
+    def _stop(v, g):
+        v_next = v + g
+        if v_next > 0:
+            return -1
+        elif v_next < 0:
+            return +1
+        else:
+            return 0
+
+    gx, gy = calc_gravity(x, y)
+    return (_stop(vx, gx), _stop(vy, gy))
