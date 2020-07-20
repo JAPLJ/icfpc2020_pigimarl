@@ -51,6 +51,9 @@ class Fortress:
                     missile_trajectory = calc_trajectory(ship.x, ship.y, ship.vx, ship.vy, moves, res_turn)
                     ok = False
                     for i in range(res_turn):
+                        x, y = missile_trajectory[i]
+                        if max(abs(x), abs(y)) <= state.planet_radius or max(abs(x), abs(y)) > state.gravity_radius:
+                            break
                         if is_near(missile_trajectory[i], eship_trajectory[i]):
                             ok = True
                             break
