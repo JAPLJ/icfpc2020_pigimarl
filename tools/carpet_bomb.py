@@ -5,6 +5,20 @@ sys.path.append('app/')
 from multiship import *
 from utils import *
 
+def calc_gravity1(x, y):
+    """
+    座標 (x, y) に働く重力のベクトルを返す
+    :param x:
+    :param y:
+    :return:
+    """
+    if abs(x) > abs(y):
+        return -sign(x), 0
+    elif abs(x) < abs(y):
+        return 0, -sign(y)
+    else:
+        return -sign(x), -sign(y)
+
 
 def go_into_orbit_2(planet_r, gravity_r, x0, y0, vx0, vy0):
     ln = 1
@@ -39,7 +53,7 @@ class CarpetBombMother:
         res = []
 
         if self.turn == 0:
-            gx, gy = calc_gravity(ship.x, ship.y)
+            gx, gy = calc_gravity1(ship.x, ship.y)
             res.append({'command': 'accel', 'x': -gx, 'y': -gy})
             self.turn += 1
             return res
