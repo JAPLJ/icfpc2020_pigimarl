@@ -46,7 +46,7 @@ class CarpetBombMother:
             res.append({'command': 'accel', 'x': nd[0], 'y': nd[1]})
             self.orbit2 = self.orbit2[1:]
         
-        elif self.turn % 2 == 0 and ship.params.energy >= 1:
+        elif self.turn % 3 == 0 and ship.params.energy >= 1:
             nd = self._go_outer(state, ship)
             if nd is not None:
                 res.append({'command': 'accel', 'x': nd[0], 'y': nd[1]})
