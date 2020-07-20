@@ -125,8 +125,8 @@ def min_turn(gravity_r, planet_r, x0, y0, vx0, vy0, moves, turns, ships):
     return min_i
 
 
-def fire_target(gravity_r, planet_r, x0, y0, vx0, vy0, turns, ships, max_ln):
-    mt_opt = 1000
+def fire_target(gravity_r, planet_r, x0, y0, vx0, vy0, turns, ships, max_ln, ub):
+    mt_opt = ub + 1
     accs_opt = None
 
     for ln in range(1, max_ln + 1):

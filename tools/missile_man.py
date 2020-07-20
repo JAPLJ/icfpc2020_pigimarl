@@ -65,7 +65,7 @@ class MissileMan:
                 commands.append({'command': 'accel', 'x': ax, 'y': ay})
             else:
                 accels = fire_target(state.gravity_radius, state.planet_radius, ship.x, ship.y, ship.vx, ship.vy,
-                                     256 - self.turn, state.enemy_ships, 1)
+                                     256 - self.turn, state.enemy_ships, 1, 10)
                 if accels is not None:
                     commands.append(
                         {'command': 'split', 'ship_ai_info': ShipAIInfo(Missile(accels), len(accels), 0, 0, 1)})
