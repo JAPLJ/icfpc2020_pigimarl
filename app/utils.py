@@ -60,23 +60,27 @@ DX = [-1, -1, -1, 0, 1, 1, 1, 0]
 DY = [-1, 0, 1, 1, 1, 0, -1, -1]
 
 
-def gravity_check(planet_r, x0, y0, vx0, vy0, moves):
+def gravity_check(planet_r, x0, y0, vx0, vy0, moves, rot_sign=None):
     """
     (x0, y0) から速度 (vx0, vy0) で始めて、かつ最初の len(moves) 回は moves に従って accel するとする
     このとき 256 ターンにわたって墜落しないかつ外に出ないなら True を返す
     """
     x, y = x0, y0
     vx, vy = vx0, vy0
+    rot_sum = 0
     for i in range(256):
         if i < len(moves):
             vx, vy = vx + moves[i][0], vy + moves[i][1]
         (x, y, vx, vy) = next_pos(x, y, vx, vy)
+        rot_sum += x * vy - y * vx
         if max(abs(x), abs(y)) <= planet_r:
             return False
-    return True
+    if rot_sign is None:
+        return True
+    return sign(rot_sum) == rot_sign
 
 
-def go_into_orbit(planet_r, x0, y0, vx0, vy0):
+def go_into_orbit(planet_r, x0, y0, vx0, vy0, rot_sign=None):
     """
     (x0, y0) から速度 (vx0, vy0) で始めたとき、256 ターンにわたって墜落しないかつ外に出ないような
     最初に行うべき accel の列を返す
@@ -89,7 +93,7 @@ def go_into_orbit(planet_r, x0, y0, vx0, vy0):
             d = p[i]
             dx, dy = DX[d], DY[d]
             ms = [(dx, dy) for i in range(ln)]
-            if gravity_check(planet_r, x0, y0, vx0, vy0, ms):
+            if gravity_check(planet_r, x0, y0, vx0, vy0, ms, rot_sign):
                 return ms
         ln += 1
 
