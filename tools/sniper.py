@@ -37,10 +37,9 @@ class Sniper:
             res.append({'command': 'accel', 'x': ms[0], 'y': ms[1]})
             self.orbit = self.orbit[1:]
         elif ship.params.energy > 0:
-
             # もう軌道入りはしている
             # もし追加で accel をしたいならここでやる
-            pass
+            if
 
         # 撃つぜレーザー
         to_attack = None
