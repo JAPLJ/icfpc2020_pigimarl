@@ -63,16 +63,6 @@ class DebrisEscaper:
     def __init__(self):
         pass
 
-    def action(self, state, ship):
-        mother = None
-        for s in state.my_ships:
-            if s.id == self.mother_id:
-                mother = s
-
-        for eship in state.enemy_ships:
-            (enx, eny, _, _) = next_pos(eship.x, eship.y, eship.vx, eship.vy)
-            if abs(nx - enx) <= 3 and abs(ny - eny) <= 3:
-                return [{'command': 'suicide'}]
-        
+    def action(self, state, ship):        
         return []
 
