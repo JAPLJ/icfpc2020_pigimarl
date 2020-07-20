@@ -11,6 +11,27 @@ from multiship import Multiship
 
 API_KEY = 'c16bab7da69d411da59ce8227e5d9034'
 
+import time
+import threading
+
+class TimestampLogger(threading.Thread):
+    def __init__(self):
+        super().__init__()
+        self.alive = True
+        self.start()
+
+    def __del__(self):
+        self.kill()
+
+    def kill(self):
+        self.alive = False
+        self.join()
+
+    def run(self):
+        while self.alive:
+            time.sleep(0.2)
+            print(f"[{datetime.datetime.now()} TIMESTAMPER] STAMP")
+
 
 def run(server_url, player_key, ai_selector, json_log_path=None):
     """
@@ -111,6 +132,7 @@ def make_req_commands(player_key, commands):
 
 
 def main():
+    x = TimestampLogger()
     server_url = sys.argv[1]
     player_key = int(sys.argv[2])
     json_log_path = None if len(sys.argv) < 4 else sys.argv[3]
@@ -125,6 +147,8 @@ def main():
         traceback.print_exc()
         sys.stdout.flush()
         sys.stderr.flush()
+    
+    x.kill()
 
 
 if __name__ == '__main__':
