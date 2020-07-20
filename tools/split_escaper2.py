@@ -12,7 +12,7 @@ MAX_TURNS = 256
 class SplitEscaper2:
     CHECK_TURN = 15  # 今後このターンで墜落・範囲外にならないことを確認
     ESCAPE_DMG = 50  # これ以上のダメージ（温度増加含む）で回避行動を取る
-    DUPLICATION_TURN = 3
+    DUPLICATION_TURN = 5
 
     def __init__(self):
         self.into_orbit_moves = None
@@ -70,7 +70,7 @@ class SplitEscaper2:
         if len(self.into_orbit_moves) > 0:
             acc = self.into_orbit_moves.pop(0)
         elif not utils.gravity_check(state.planet_radius, state.gravity_radius,
-                                     ship.x, ship.y, ship.vx, ship.vy, [], self.CHECK_TURN):
+                                     ship.x, ship.y, ship.vx, ship.vy, [], left_time):
             acc = self.finc_valid_acc(ship, state.planet_radius, state.gravity_radius, left_time)
 
         if acc != (0, 0):
