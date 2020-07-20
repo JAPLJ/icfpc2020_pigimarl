@@ -9,7 +9,7 @@ class AISelector:
     def select(self, side, limit, enemy_params) -> ShipAIInfo:
         if side == Side.ATTACK:
             # enemy_params is ShipParameter
-            return ShipAIInfo(CarpetBombMother(), 152, 0, 10, 120)
+            return ShipAIInfo(CarpetBombMother(), 132, 33, 4, 100)
         else:
             # enemy_params is None
             return ShipAIInfo(MainShipAI(), 100, 0, 8, 100)
