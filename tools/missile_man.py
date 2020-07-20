@@ -107,7 +107,7 @@ class MissileMan:
 
                 if accels is not None:
                     commands.append(
-                        {'command': 'split', 'ship_ai_info': ShipAIInfo(Mine, 5, 0, 0, 1)})
+                        {'command': 'split', 'ship_ai_info': ShipAIInfo(Mine(), 5, 0, 0, 1)})
 
         self.turn += 1
 
