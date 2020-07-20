@@ -3,7 +3,6 @@ import sys
 sys.path.append('app/')
 
 from conversion import *
-from utils import *
 
 
 @dataclasses.dataclass
@@ -65,22 +64,7 @@ class Multiship:
 
         for ship in state.my_ships:
             ship_ai = self.ship_id_to_ship_ai[ship.id]
-            print(ship.id, ship_ai)
-
             commands = ship_ai.action(state, ship)
-
-            vx = ship.vx
-            vy = ship.vy
-            gx, gy = calc_gravity(ship.x, ship.y)
-            vx += gx
-            vy += gy
-
-            for command in commands:
-                if command['command'] == 'accel':
-                    ax = command['x']
-                    ay = command['y']
-                    vx += ax
-                    vy += ay
 
             for command in commands:
                 if command['command'] == 'split':
@@ -90,8 +74,9 @@ class Multiship:
                     command['p2'] = ship_ai_info.p2
                     command['p3'] = ship_ai_info.p3
                     command['p4'] = ship_ai_info.p4
-                    res[ship.id] = commands
 
                     self.par_ship_id_to_ship_ai[ship.id] = ship_ai_info.ship_ai
+
+            res[ship.id] = commands
 
         return res
