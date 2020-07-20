@@ -145,15 +145,18 @@ def fire_target(gravity_r, planet_r, x0, y0, vx0, vy0, turns, ships, max_ln, ub)
 
 
 def near_score(gravity_r, planet_r, x0, y0, vx0, vy0, moves, turns, ships):
-    score = 0.0
     orbit0 = future_orbit(gravity_r, planet_r, x0, y0, vx0, vy0, moves, turns)
+    if len(orbit0) < turns:
+        return 0.0
+
+    score = 0.0
     for s in ships:
         orbit1 = future_orbit(gravity_r, planet_r, s.x, s.y, s.vx, s.vy, [], turns)
         for i in range(min(len(orbit0), len(orbit1))):
             x0, y0 = orbit0[i]
             x1, y1 = orbit1[i]
             d = max(abs(x0 - x1), abs(y0 - y1))
-            score += 1.0 / d
+            score += 1.0 / (d + 1)
     return score
 
 
