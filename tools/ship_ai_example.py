@@ -18,7 +18,7 @@ class MainShipAI:
 
         # soul がある間は SubShipAI を産み続ける
         if ship.params.soul > 1:
-            commands.append({'command': 'split', 'ship_ai_info': ShipAIInfo(SubShipAI(count=5), 0, 0, 0, 1)})
+            commands.append({'command': 'split', 'ship_ai_info': ShipAIInfo(SubShipAI(count=20), 0, 0, 0, 1)})
 
         return commands
 
