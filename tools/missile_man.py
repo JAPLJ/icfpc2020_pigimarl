@@ -79,7 +79,7 @@ class MissileMan:
                 commands.append({'command': 'accel', 'x': ax, 'y': ay})
             elif self.turn % self.missile_interval == 0:
                 accels = fire_target(state.gravity_radius, state.planet_radius, ship.x, ship.y, ship.vx, ship.vy,
-                                     384 - self.turn, state.enemy_ships, self.stalk_max_energy, 1000)
+                                     384 - self.turn, state.enemy_ships, self.missile_max_energy, 1000)
                 if accels is not None:
                     commands.append(
                         {'command': 'split', 'ship_ai_info': ShipAIInfo(Missile(accels), len(accels), 0, 0, 1)})

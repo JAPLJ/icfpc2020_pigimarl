@@ -1,7 +1,7 @@
-from common_interface import *
+import sys
+
 from ai_interface import *
 
-import sys
 sys.path.append('app/')
 from utils import *
 from collections import defaultdict
@@ -37,6 +37,7 @@ class Sniper:
             res.append({'command': 'accel', 'x': ms[0], 'y': ms[1]})
             self.orbit = self.orbit[1:]
         elif ship.params.energy > 0:
+
             # もう軌道入りはしている
             # もし追加で accel をしたいならここでやる
             pass
@@ -71,10 +72,9 @@ class Sniper:
 
         return res
 
-
     def set_specs(self, limit, side):
         souls = 100
         if side == Side.ATTACK:
-            return ShipParameter(limit - (96*4 + 12*8 + 1*2), 96, 8, 1)
+            return ShipParameter(limit - (96 * 4 + 12 * 8 + 1 * 2), 96, 8, 1)
         else:
-            return ShipParameter(limit - (32*4 + 12*16 + 1*2), 32, 16, 1)
+            return ShipParameter(limit - (32 * 4 + 12 * 16 + 1 * 2), 32, 16, 1)
