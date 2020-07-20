@@ -11,6 +11,11 @@ import random
 TEMP_LIMIT = 64
 
 class AI:
+    def __init__(self):
+        self.into_orbit = dict()
+        self.into_orbit_moves = dict()
+        self.into_orbit_moves_idx = dict()
+
     def action(self, state):
         commands = defaultdict(list)
         enemy_ships = list(filter(lambda eship: eship.params.soul != 0, state.enemy_ships))
@@ -28,19 +33,32 @@ class AI:
             # 一番IDが小さい敵を撃つ。有効なダメージじゃなかったらやめる
             laser_power = min(ship.params.laser_power, TEMP_LIMIT - ship.temp)
             expected_damage = laser_damage(ship.x, ship.y, target_x, target_y, laser_power)
-            if expected_damage <= enemy_ship.params.cooling_rate: continue
-            commands[ship.id] = [{"command": "laser", "power": laser_power, "x": target_x, "y":target_y}]
+            if expected_damage <= enemy_ship.params.cooling_rate:
+                commands[ship.id] = [{"command": "laser", "power": laser_power, "x": target_x, "y":target_y}]
 
-            # random walk
-            gravity_x, gravity_y = calc_gravity(ship.x, ship.y)
-            dx = min(max(random.randint(-1, 1) - gravity_x, -1), 1)
-            dy = min(max(random.randint(-1, 1) - gravity_y, -1), 1)
-            commands[ship.id] = [{"command": "accel", "x": dx, "y": dy}]
+
+            if ship.id not in self.into_orbit:
+                self.into_orbit[ship.id] = False
+                self.into_orbit_moves[ship.id] = go_into_orbit(state.planet_radius, ship.x, ship.y, ship.vx, ship.vy)
+                self.into_orbit_moves_idx[ship.id] = 0
+
+            if not self.into_orbit[ship.id]:
+                ms = self.into_orbit_moves[ship.id][self.into_orbit_moves_idx[ship.id]]
+                commands[ship.id].append({'command': 'accel', 'x': ms[0], 'y': ms[1]})
+                self.into_orbit_moves_idx[ship.id] += 1
+                self.into_orbit[ship.id] = self.into_orbit_moves_idx[ship.id] == len(self.into_orbit_moves[ship.id])
+            # # random walk
+            # gravity_x, gravity_y = calc_gravity(ship.x, ship.y)
+            # dx = -gravity_x
+            # dy = -gravity_y
+            # # dx = min(max(random.randint(-1, 1) - gravity_x, -1), 1)
+            # # dy = min(max(random.randint(-1, 1) - gravity_y, -1), 1)
+            # commands[ship.id] = [{"command": "accel", "x": dx, "y": dy}]
 
         return commands
 
     def set_specs(self, limit: int, side: int) -> ShipParameter:
-        energy = 30
+        energy = 60
         laser_power = 64
         cooling_rate = 0
         soul = 1
