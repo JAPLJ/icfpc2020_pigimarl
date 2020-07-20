@@ -15,5 +15,5 @@ class AISelector:
                 return ShipAIInfo(Sniper(), limit - (96*4 + 12*8 + 1*2), 96, 8, 1)
         else:
             # enemy_params is None
-                return ShipAIInfo(MissileMan(), limit - (12 * 8 + 2 * 128), 0, 8, 128)
+                return ShipAIInfo(MissileMan(), limit - (2 * 128), 0, 0, 128)
             # return ShipAIInfo(SplitEscaper(), 128, 0, 10, 100)
