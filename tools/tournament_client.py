@@ -25,7 +25,7 @@ def run(server_url, player_key, attacker_solver, defender_solver=None, json_log_
 
     print('[RUNNER] join game')
     req_join = make_req_join(player_key)
-    (side, limit) = send(server_url, req_join)
+    (side, limit, enemy_param) = send(server_url, req_join)
 
     solver = attacker_solver
     if side == Side.DEFENSE and defender_solver is not None:
@@ -117,8 +117,9 @@ def main():
     # sys.setrecursionlimit(1000000)
     from multiship import Multiship, ShipAIInfo
     from ship_ai_example import MainShipAI
+    from carpet_bomb import CarpetBombMother
 
-    attacker = ShipAIInfo(MainShipAI(), 100, 0, 8, 100)
+    attacker = ShipAIInfo(CarpetBombMother(), 152, 0, 10, 120)
     defender = ShipAIInfo(MainShipAI(), 100, 0, 8, 100)
 
     run(server_url, player_key, Multiship(attacker, defender), json_log_path=json_log_path)
