@@ -5,7 +5,7 @@ import sys
 sys.path.append('app/')
 import utils
 
-# Laserが痛そうなら回避行動
+MAX_TURNS = 256
 
 class Escaper:
     COOL_RATE = 16
@@ -20,6 +20,7 @@ class Escaper:
         a_range = range(-ship.max_accel, ship.max_accel + 1)
         acc_candidate = []
         current_energy = utils.mechanical_energy(ship.x, ship.y, ship.vx, ship.vy)
+        left_time = MAX_TURNS - state.current_turn
         for ax, ay in product(a_range, a_range):
             if (ax, ay) == (0, 0):
                 continue
@@ -29,7 +30,7 @@ class Escaper:
                 ship.vx + ax,
                 ship.vy + ay
             )
-            if current_energy > next_energy and current_energy < 100:
+            if current_energy > next_energy and current_energy < 110:
                 continue
             moves = [(ax, ay)]
             if utils.gravity_check(planet_radius, gravity_radius,
