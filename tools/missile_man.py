@@ -47,8 +47,8 @@ class MissileMan:
         else:
             if self.go_into_orbit_accels is None:
                 rot_sum = 0
-                for ship in state.enemy_ships:
-                    rot_sum += ship.x * ship.vy - ship.y * ship.vx
+                for s in state.enemy_ships:
+                    rot_sum += s.x * s.vy - s.y * s.vx
                 rot_sign = 1 if rot_sum > 0 else -1
                 self.go_into_orbit_accels = go_into_orbit(state.planet_radius, ship.x, ship.y, ship.vx, ship.vy,
                                                           -rot_sign)
