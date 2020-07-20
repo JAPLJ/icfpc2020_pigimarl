@@ -63,11 +63,12 @@ class MissileMan:
             if len(self.go_into_orbit_accels) > 0:
                 ax, ay = self.go_into_orbit_accels.pop(0)
                 commands.append({'command': 'accel', 'x': ax, 'y': ay})
-            elif self.turn % 2 == 0:
-                nx, ny, nvx, nvy = next_pos(ship.x, ship.y, ship.vx, ship.vy)
-                accels = go_into_orbit(state.gravity_radius, state.planet_radius, nx, ny, nvx, nvy)
-                commands.append(
-                    {'command': 'split', 'ship_ai_info': ShipAIInfo(Missile(accels), len(accels), 0, 0, 1)})
+            else:
+                accels = fire_target(state.gravity_radius, state.planet_radius, ship.x, ship.y, ship.vx, ship.vy,
+                                     256 - self.turn, state.enemy_ships, 1)
+                if accels is not None:
+                    commands.append(
+                        {'command': 'split', 'ship_ai_info': ShipAIInfo(Missile(accels), len(accels), 0, 0, 1)})
 
         self.turn += 1
 
