@@ -33,9 +33,8 @@ class Escaper:
             return acc_candidate[0]
         return stop(ship.x, ship.y, ship.vx, ship.vy)
 
-    def action(self, state):
+    def action(self, state, ship):
         commands = []
-        ship = state.my_ships[0]
         acc = (0, 0)
 
         if self.into_orbit_moves is None:
@@ -67,7 +66,7 @@ class Escaper:
         if acc != (0, 0):
             commands.append({'command': 'accel', 'x': acc[0], 'y': acc[1]})
         self.past_acc = acc
-        return {ship.id: commands}
+        return commands
 
 
     def set_specs(self, limit, side):

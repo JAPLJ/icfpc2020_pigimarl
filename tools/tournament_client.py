@@ -115,9 +115,6 @@ def main():
     player_key = int(sys.argv[2])
     json_log_path = None if len(sys.argv) < 4 else sys.argv[3]
 
-    import escaper
-    import sniper
-    # run(server_url, player_key, sniper.Sniper(), escaper.Escaper(), json_log_path=json_log_path)
     # sys.setrecursionlimit(1000000)
     from ai_selector import AISelector
     
