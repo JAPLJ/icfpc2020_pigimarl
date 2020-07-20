@@ -52,10 +52,10 @@ def run(server_url, player_key, attacker_solver, defender_solver=None, json_log_
         if state.game_stage == GameStage.FINISHED:
             break
 
-    if json_logging:
-        import json
-        with open(json_log_path, 'w') as f:
-            f.write(json.dumps(json_logs))
+    # if json_logging:
+    #     import json
+    #     with open(json_log_path, 'w') as f:
+    #         f.write(json.dumps(json_logs))
             # f.write(f'[{",".join(json_logs)}]')
 
     print('[RUNNER] game finished')
