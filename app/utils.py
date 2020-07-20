@@ -98,6 +98,52 @@ def go_into_orbit(gravity_r, planet_r, x0, y0, vx0, vy0, rot_sign=None):
         ln += 1
 
 
+def future_orbit(gravity_r, planet_r, x0, y0, vx0, vy0, moves, turns):
+    x, y = x0, y0
+    vx, vy = vx0, vy0
+    orbit = []
+    for i in range(turns):
+        if i < len(moves):
+            vx, vy = vx + moves[i][0], vy + moves[i][1]
+        (x, y, vx, vy) = next_pos(x, y, vx, vy)
+        if max(abs(x), abs(y)) <= planet_r or max(abs(x), abs(y)) > gravity_r:
+            break
+        orbit.append((x, y))
+    return orbit
+
+
+def min_turn(gravity_r, planet_r, x0, y0, vx0, vy0, moves, turns, ships):
+    orbit0 = future_orbit(gravity_r, planet_r, x0, y0, vx0, vy0, moves, turns)
+    min_i = 1000
+    for s in ships:
+        orbit1 = future_orbit(gravity_r, planet_r, s.x, s.y, s.vx, s.vy, [], turns)
+        for i in range(min(len(orbit0), len(orbit1))):
+            x0, y0 = orbit0[i]
+            x1, y1 = orbit1[i]
+            if i >= len(moves) and max(abs(x0 - x1), abs(y0 - y1)) <= 3:
+                min_i = min(min_i, i)
+    return min_i
+
+
+def fire_target(gravity_r, planet_r, x0, y0, vx0, vy0, turns, ships, max_ln, ub):
+    mt_opt = ub + 1
+    accs_opt = None
+
+    for ln in range(1, max_ln + 1):
+        p = list(range(8))
+        random.shuffle(p)
+        for i in range(8):
+            d = p[i]
+            dx, dy = DX[d], DY[d]
+            ms = [(0, 0)] + [(dx, dy) for i in range(ln)]
+            mt = min_turn(gravity_r, planet_r, x0, y0, vx0, vy0, ms, turns, ships)
+            if mt < mt_opt:
+                mt_opt = mt
+                accs_opt = ms[1:]
+
+    return accs_opt
+
+
 # 8 近傍
 neighbours = [(-1, 0), (-1, -1), (0, -1), (1, -1), (1, 0), (1, 1), (0, 1), (-1, 1)]
 
@@ -171,3 +217,20 @@ def stop(x, y, vx, vy):
 
     gx, gy = calc_gravity(x, y)
     return (_stop(vx, gx), _stop(vy, gy))
+
+
+def guess_next(v):
+    '''
+    list vを受け取って周期性があるかを判定し，ある場合は次の要素を推測する
+    ない場合はNone
+    例: [-1, 0, 1, -1, 0, 1] -> -1
+    '''
+    for p in range(1, len(v) // 2 + 1):
+        ok = True
+        for i in range(len(v) - p):
+            if v[i] != v[i + p]:
+                ok = False
+                break
+        if ok:
+            return v[-p]
+    return None
