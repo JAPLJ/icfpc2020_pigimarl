@@ -12,8 +12,8 @@ class Sniper:
         self.turn = 0
         self.orbit = None
         self.eship_accel_history = defaultdict(list)
-        self.stalk_interval = stalk_interval
-        self.stalk_max_energy = stalk_max_energy
+        self.stalk_interval = stalk_interval  # 方向転換してストーキングする間隔 (1 だったら毎ターン)
+        self.stalk_max_energy = stalk_max_energy  # ストーキング一回あたりに使う燃料の最大値
 
     def action(self, state, ship):
         res = []

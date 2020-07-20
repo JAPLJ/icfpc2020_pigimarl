@@ -42,7 +42,7 @@ class Missile:
 # defender = ShipAIInfo(MissileMan(), 448 - (12 * 8 + 2 * 128), 0, 8, 128)
 
 class MissileMan:
-    def __init__(self, yousumi_turns=10, missile_interval=2, missile_max_energy=1, stalk_interval=20,
+    def __init__(self, yousumi_turns=10, missile_interval=3, missile_max_energy=1, stalk_interval=20,
                  stalk_max_energy=4):
         self.go_into_orbit_accels = None
         self.turn = 0
@@ -72,7 +72,7 @@ class MissileMan:
 
             if len(self.go_into_orbit_accels) == 0 and self.turn % self.stalk_interval == 0:
                 self.go_into_orbit_accels = stalk(state.gravity_radius, state.planet_radius, ship.x, ship.y, ship.vx,
-                                                  ship.vy, 384 - self.turn, state.enemy_ships,
+                                                  ship.vy, min(100, 384 - self.turn), state.enemy_ships,
                                                   self.stalk_max_energy)
 
             if len(self.go_into_orbit_accels) > 0:
@@ -80,7 +80,7 @@ class MissileMan:
                 commands.append({'command': 'accel', 'x': ax, 'y': ay})
             elif self.turn % self.missile_interval == 0:
                 accels = fire_target(state.gravity_radius, state.planet_radius, ship.x, ship.y, ship.vx, ship.vy,
-                                     384 - self.turn, state.enemy_ships, self.missile_max_energy, 1000)
+                                     min(100, 384 - self.turn), state.enemy_ships, self.missile_max_energy, 1000)
                 if accels is not None:
                     commands.append(
                         {'command': 'split', 'ship_ai_info': ShipAIInfo(Missile(accels), len(accels), 0, 0, 1)})
