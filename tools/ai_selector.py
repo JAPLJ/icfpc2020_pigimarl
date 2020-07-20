@@ -12,4 +12,4 @@ class AISelector:
             return ShipAIInfo(Sniper(), 128, 0, 10, 100)
         else:
             # enemy_params is None
-            return ShipAIInfo(Sniper(), 128, 0, 10, 100)
+            return ShipAIInfo(SplitEscaper(), 128, 0, 10, 100)

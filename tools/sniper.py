@@ -34,7 +34,7 @@ class Sniper:
         if ship.id not in self.into_orbit:
             self.into_orbit[ship.id] = False
             print('hoge', state.planet_radius, state.gravity_radius, ship.x, ship.y, ship.vx, ship.vy, file=sys.stderr)
-            self.into_orbit_moves[ship.id] = go_into_orbit(state.planet_radius, state.gravity_radius, ship.x, ship.y, ship.vx, ship.vy)
+            self.into_orbit_moves[ship.id] = go_into_orbit(state.gravity_radius, state.planet_radius, ship.x, ship.y, ship.vx, ship.vy)
             print('fuga', file=sys.stderr)
             self.into_orbit_moves_idx[ship.id] = 0
 
