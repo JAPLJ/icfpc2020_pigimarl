@@ -64,6 +64,10 @@ class MissileMan:
                                                           ship.vx, ship.vy,
                                                           -rot_sign)
 
+            if len(self.go_into_orbit_accels) == 0 and self.turn % 20 == 0:
+                self.go_into_orbit_accels = stalk(state.gravity_radius, state.planet_radius, ship.x, ship.y, ship.vx,
+                                                  ship.vy, 256 - self.turn, state.enemy_ships, 4)
+
             if len(self.go_into_orbit_accels) > 0:
                 ax, ay = self.go_into_orbit_accels.pop(0)
                 commands.append({'command': 'accel', 'x': ax, 'y': ay})
