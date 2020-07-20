@@ -40,7 +40,7 @@ class Sniper:
 
                 pvx, pvy = 0, 0
                 # 次の一手が直近N手の周期性から予測できる場合はそれを使い、そうでないなら最新のaccelのものを使う
-                next_command = guess_next(self.eship_accel_history[eship.id][-2:])
+                next_command = guess_next(self.eship_accel_history[eship.id][-5:])
                 print("HIST", self.eship_accel_history[eship.id])
                 if next_command is not None:
                     print("PRED", next_command)
