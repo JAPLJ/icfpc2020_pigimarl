@@ -82,7 +82,7 @@ class Escaper:
                 acc = self.finc_valid_acc(ship, state.planet_radius, state.gravity_radius)
 
         if ship.params.soul >= 2 and self.duplication_cunt < 0:
-            res.append({'command': 'split', 'ship_ai_info': ShipAIInfo(DebrisBomb(ship.id), 0, 0, 0, 1)})
+            commands.append({'command': 'split', 'ship_ai_info': ShipAIInfo(DebrisBomb(ship.id), 0, 0, 0, 1)})
 
         if acc != (0, 0):
             commands.append({'command': 'accel', 'x': acc[0], 'y': acc[1]})
@@ -92,3 +92,26 @@ class Escaper:
 
     def set_specs(self, limit, side):
         return ShipParameter(limit - (12*self.COOL_RATE + 2*4), 0, self.COOL_RATE, 4)
+
+
+class DebrisBomb:
+    def __init__(self, mother_id):
+        self.mother_id = mother_id
+
+    def action(self, state, ship):
+        mother = None
+        for s in state.my_ships:
+            if s.id == self.mother_id:
+                mother = s
+
+        (nx, ny, _, _) = next_pos(ship.x, ship.y, ship.vx, ship.vy)
+        (mnx, mny, _, _) = next_pos(mother.x, mother.y, mother.vx, mother.vy)
+        if abs(nx -  mnx) <= 3 and abs(ny - mny) <= 3:
+            return []
+
+        for eship in state.enemy_ships:
+            (enx, eny, _, _) = next_pos(eship.x, eship.y, eship.vx, eship.vy)
+            if abs(nx - enx) <= 3 and abs(ny - eny) <= 3:
+                return [{'command': 'suicide'}]
+        
+        return []
