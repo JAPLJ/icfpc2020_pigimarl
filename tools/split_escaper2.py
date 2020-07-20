@@ -48,7 +48,7 @@ class SplitEscaper2:
 
     def action(self, state, ship):
         commands = []
-        self.duplication_cunt -= 1
+        self.duplication_count -= 1
 
         if self.into_orbit_moves is None:
             self.into_orbit_moves = utils.go_into_orbit(
@@ -63,8 +63,8 @@ class SplitEscaper2:
         if acc != (0, 0):
             commands.append({'command': 'accel', 'x': acc[0], 'y': acc[1]})
 
-        if ship.params.soul > 2 and self.duplication_cunt < 0:
-            self.duplication_cunt = self.DUPLICATION_TURN
+        if ship.params.soul > 2 and self.duplication_count < 0:
+            self.duplication_count = self.DUPLICATION_TURN
             commands.append({'command': 'split', 'ship_ai_info': ShipAIInfo(SubShipAI(), 0, 0, 0, 1)})
 
         return commands
