@@ -12,6 +12,9 @@ class Sniper:
         self.into_orbit_moves = dict()
         self.into_orbit_moves_idx = dict()
 
+        self.eship_accel_x = []
+        self.eship_accel_y = []
+
     def action(self, state, ship):
         res = []
 
@@ -25,7 +28,7 @@ class Sniper:
             res.append({'command': 'accel', 'x': ms[0], 'y': ms[1]})
             self.into_orbit_moves_idx[ship.id] += 1
             self.into_orbit[ship.id] = self.into_orbit_moves_idx[ship.id] == len(self.into_orbit_moves[ship.id])
-        
+
         to_attack = None
         max_dmg = 0
         for eship in state.enemy_ships:
@@ -33,10 +36,16 @@ class Sniper:
                 # 死んでるし
                 continue
 
-            pvx, pvy = 0, 0
+            prev_accel = [0, 0]
             for rc in eship.commands:
                 if rc.kind == 0:
-                    pvx, pvy = -rc.x, -rc.y
+                    prev_accel = [rc.x, rc.y]
+            self.eship_accel_x.append(prev_accel[0])
+            self.eship_accel_y.append(prev_accel[1])
+            nax = guess_next(self.eship_accel_x)
+            nay = guess_next(self.eship_accel_y)
+            pvx = -nax if nax else 0
+            pvy = -nay if nax else 0
 
             (nx, ny, _, _) = next_pos(eship.x, eship.y, eship.vx + pvx, eship.vy + pvy)
             max_lp = min(ship.params.laser_power, ship.max_temp - ship.temp)
