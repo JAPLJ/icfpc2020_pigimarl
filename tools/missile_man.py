@@ -56,6 +56,13 @@ class MissileMan:
             commands.append({'command': 'accel', 'x': -gx, 'y': -gy})
 
         else:
+            if ship.temp >= 64 and ship.params.soul >= 2:
+                # 次の子供にすべてを託し、自分はミサイルと化す
+                child = MissileMan()
+                child.go_into_orbit_accels = self.go_into_orbit_accels
+                child.turn = self.turn
+                commands.append({'command': 'split', 'ship_ai_info': ShipAIInfo(child, ship.params.energy, ship.params.laser_power, ship.params.cooling_rate, ship.params.soul-1)})
+
             if self.go_into_orbit_accels is None:
                 rot_sum = 0
                 for s in state.enemy_ships:
@@ -72,10 +79,6 @@ class MissileMan:
             if len(self.go_into_orbit_accels) > 0:
                 ax, ay = self.go_into_orbit_accels.pop(0)
                 commands.append({'command': 'accel', 'x': ax, 'y': ay})
-            elif ship.temp >= 64:
-                # 次の子供にすべてを託し、自分はミサイルと化す
-                commands.append({'command': 'split', 'ship_ai_info': ShipAIInfo(MissileMan(), ship.params.energy, ship.params.laser_power, ship.params.cooling_rate, ship.params.soul)})
-
             elif self.turn % 2 == 0:
                 accels = fire_target(state.gravity_radius, state.planet_radius, ship.x, ship.y, ship.vx, ship.vy,
                                      256 - self.turn, state.enemy_ships, 1, 1000)
