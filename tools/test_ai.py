@@ -15,18 +15,23 @@ class TestAI:
         res = {}
 
         for ship in state.my_ships:
-            # print(f'id={ship.id}, x={ship.x}, y={ship.y}')
-
-            if state.my_side == Side.ATTACK:
-                tx = state.gravity_radius
-                ty = state.gravity_radius
+            if state.my_side == Side.DEFENSE:
+                if ship.params.soul > 1 and ship.temp > 0:
+                    res[ship.id] = [{'command': 'split', 'p1': 1, 'p2': 0, 'p3': 0, 'p4': 1}]
+                else:
+                    gx, gy = calc_gravity(ship.x, ship.y)
+                    res[ship.id] = [{'command': 'accel', 'x': gx, 'y': gy}]
             else:
-                tx = state.planet_radius + 1
-                ty = state.planet_radius + 1
-            ax, ay = move_to_target(state.gravity_radius, state.planet_radius, ship.x, ship.y, ship.vx, ship.vy, tx, ty)
-            res[ship.id] = [{'command': 'accel', 'x': ax, 'y': ay}]
+                res[ship.id] = [
+                    {'command': 'lazer', 'x': state.enemy_ships[0].x, 'y': state.enemy_ships[0].y,
+                     'power': ship.params.p2}]
+
+            print(f'id={ship.id}, x={ship.x}, y={ship.y}, vx={ship.vx}, vy={ship.vy}, ')
 
         return res
 
     def set_specs(self, limit, side):
-        return ShipParameter(limit - (4 * 0 + 12 * 8 + 1 * 2), 0, 8, 1)
+        if side == Side.ATTACK:
+            return ShipParameter(0, (limit - 2) // 12, 0, 1)
+        else:
+            return ShipParameter(limit - (4 * 0 + 12 * 0 + 2 * 2), 0, 0, 2)
