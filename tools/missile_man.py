@@ -6,6 +6,9 @@ from multiship import *
 from utils import *
 
 
+TURN = 384
+
+
 class Missile:
     def __init__(self, accels):
         self.accels = accels
@@ -99,12 +102,12 @@ class MissileMan:
                 commands.append({'command': 'accel', 'x': ax, 'y': ay})
             elif self.turn % 4 == 0:
                 accels = fire_target(state.gravity_radius, state.planet_radius, ship.x, ship.y, ship.vx, ship.vy,
-                                     256 - self.turn, state.enemy_ships, 1, 1000)
+                                     TURN - self.turn, state.enemy_ships, 1, 1000)
                 if accels is not None:
                     commands.append(
                         {'command': 'split', 'ship_ai_info': ShipAIInfo(Missile(accels), len(accels), 0, 0, 1)})
             elif self.turn % 2 == 0:
-
+                if TURN - self.turn <= 20:
                 commands.append(
                     {'command': 'split', 'ship_ai_info': ShipAIInfo(Mine(), 20, 0, 0, 1)})
 
