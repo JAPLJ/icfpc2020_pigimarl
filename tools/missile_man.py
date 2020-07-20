@@ -31,41 +31,6 @@ class Missile:
         return commands
 
 
-class IntelligentMissle:
-    def __init__(self, accels):
-        self.go_into_orbit_accels = None
-        self.accels = accels
-
-    def action(self, state, ship):
-        commands = []
-
-        if self.go_into_orbit_accels is None:
-            rot_sum = 0
-            for s in state.enemy_ships:
-                rot_sum += s.x * s.vy - s.y * s.vx
-            rot_sign = 1 if rot_sum > 0 else -1
-            self.go_into_orbit_accels = go_into_orbit(state.gravity_radius, state.planet_radius, ship.x, ship.y,
-                                                        ship.vx, ship.vy,
-                                                        -rot_sign)
-
-        if len(self.go_into_orbit_accels) > 0:
-                ax, ay = self.go_into_orbit_accels.pop(0)
-                commands.append({'command': 'accel', 'x': ax, 'y': ay})
-        else:
-            nx, ny, _, _ = next_pos(ship.x, ship.y, ship.vx, ship.vy)
-
-            near = False
-            for ship in state.enemy_ships:
-                enx, eny, _, _ = next_pos(ship.x, ship.y, ship.vx, ship.vy)
-                if max(abs(nx - enx), abs(ny - eny)) <= 3:
-                    near = True
-
-            if near:
-                commands.append({'command': 'suicide'})
-
-        return commands
-
-
 class MissileMan:
     def __init__(self):
         self.go_into_orbit_accels = None
