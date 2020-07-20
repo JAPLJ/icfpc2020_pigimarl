@@ -33,7 +33,7 @@ class Escaper:
                 ship.vx + ax,
                 ship.vy + ay
             )
-            if current_energy > next_energy and current_energy < 110:
+            if current_energy > next_energy and current_energy < 100:
                 continue
             moves = [(ax, ay)]
             if utils.gravity_check(planet_radius, gravity_radius,
