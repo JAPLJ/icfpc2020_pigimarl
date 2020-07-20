@@ -39,6 +39,7 @@ def run(server_url, player_key, ai_selector, json_log_path=None):
         json_logs.append(asdict(state))
 
     while True:
+        print(f'[{datetime.datetime.now()} RUNNER] call solver.action', flush=True)
         commands = solver.action(state)
         print(f'[{datetime.datetime.now()} RUNNER] send commands:', commands, flush=True)
         req_commands = make_req_commands(player_key, commands)
