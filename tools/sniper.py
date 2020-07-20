@@ -37,9 +37,15 @@ class Sniper:
                     continue
 
                 pvx, pvy = 0, 0
-                for rc in eship.commands:
-                    if rc.kind == 0:
+                # 次の一手が周期性から予測できる場合はそれを使い、そうでないなら最新のaccelのものを使う
+                next_command = guess_next(eship.commands)
+                if next_command:
+                    if next_command.kind == 0:
                         pvx, pvy = -rc.x, -rc.y
+                else:
+                    for rc in eship.commands:
+                        if rc.kind == 0:
+                            pvx, pvy = -rc.x, -rc.y
                 
                 (nx, ny, _, _) = next_pos(eship.x, eship.y, eship.vx + pvx, eship.vy + pvy)
                 max_lp = min(ship.params.laser_power, ship.max_temp - ship.temp)
