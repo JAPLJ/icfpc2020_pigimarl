@@ -60,7 +60,7 @@ DX = [-1, -1, -1, 0, 1, 1, 1, 0]
 DY = [-1, 0, 1, 1, 1, 0, -1, -1]
 
 
-def gravity_check(planet_r, x0, y0, vx0, vy0, moves, rot_sign=None):
+def gravity_check(planet_r, x0, y0, vx0, vy0, moves, rot_sign=None, print_debug=False):
     """
     (x0, y0) から速度 (vx0, vy0) で始めて、かつ最初の len(moves) 回は moves に従って accel するとする
     このとき 256 ターンにわたって墜落しないかつ外に出ないなら True を返す
@@ -73,6 +73,8 @@ def gravity_check(planet_r, x0, y0, vx0, vy0, moves, rot_sign=None):
             vx, vy = vx + moves[i][0], vy + moves[i][1]
         (x, y, vx, vy) = next_pos(x, y, vx, vy)
         rot_sum += x * vy - y * vx
+        if print_debug:
+            print(f'x={x}, y={y}, vx={vx}, vy={vy}')
         if max(abs(x), abs(y)) <= planet_r:
             return False
     if rot_sign is None:

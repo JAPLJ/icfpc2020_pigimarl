@@ -54,7 +54,7 @@ class MissileMan:
                                                           -rot_sign)
                 print('#######################', self.go_into_orbit_accels)
                 print(gravity_check(state.planet_radius, ship.x, ship.y, ship.vx, ship.vy, self.go_into_orbit_accels,
-                                    -rot_sign))
+                                    -rot_sign, True))
 
             if len(self.go_into_orbit_accels) > 0:
                 ax, ay = self.go_into_orbit_accels.pop(0)
