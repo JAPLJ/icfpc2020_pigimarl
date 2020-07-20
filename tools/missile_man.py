@@ -42,15 +42,21 @@ class Missile:
 # defender = ShipAIInfo(MissileMan(), 448 - (12 * 8 + 2 * 128), 0, 8, 128)
 
 class MissileMan:
-    def __init__(self):
+    def __init__(self, yousumi_turns=10, missile_interval=2, missile_max_energy=1, stalk_interval=20,
+                 stalk_max_energy=4):
         self.go_into_orbit_accels = None
         self.turn = 0
+        self.yousumi_turns = yousumi_turns  # 最初に静止して相手の回転方向を見るターン数
+        self.missile_interval = missile_interval  # ミサイルを撃つ間隔 (1 だったら毎ターン)
+        self.missile_max_energy = missile_max_energy  # ミサイル一発あたりに持っていかれる燃料の最大値
+        self.stalk_interval = stalk_interval  # 方向転換してストーキングする間隔 (1 だったら毎ターン)
+        self.stalk_max_energy = stalk_max_energy  # ストーキング一回あたりに使う燃料の最大値
 
     def action(self, state, ship):
         commands = []
 
         # 最初の数ターンは様子見
-        if self.turn < 10:
+        if self.turn < self.yousumi_turns:
             gx, gy = calc_gravity(ship.x, ship.y)
             commands.append({'command': 'accel', 'x': -gx, 'y': -gy})
 
@@ -64,16 +70,16 @@ class MissileMan:
                                                           ship.vx, ship.vy,
                                                           -rot_sign)
 
-            if len(self.go_into_orbit_accels) == 0 and self.turn % 10 == 0:
+            if len(self.go_into_orbit_accels) == 0 and self.turn % self.stalk_interval == 0:
                 self.go_into_orbit_accels = stalk(state.gravity_radius, state.planet_radius, ship.x, ship.y, ship.vx,
-                                                  ship.vy, 256 - self.turn, state.enemy_ships, 4)
+                                                  ship.vy, 384 - self.turn, state.enemy_ships, self.stalk_max_energy)
 
             if len(self.go_into_orbit_accels) > 0:
                 ax, ay = self.go_into_orbit_accels.pop(0)
                 commands.append({'command': 'accel', 'x': ax, 'y': ay})
-            elif self.turn % 2 == 0:
+            elif self.turn % self.missile_interval == 0:
                 accels = fire_target(state.gravity_radius, state.planet_radius, ship.x, ship.y, ship.vx, ship.vy,
-                                     256 - self.turn, state.enemy_ships, 1, 1000)
+                                     384 - self.turn, state.enemy_ships, self.stalk_max_energy, 1000)
                 if accels is not None:
                     commands.append(
                         {'command': 'split', 'ship_ai_info': ShipAIInfo(Missile(accels), len(accels), 0, 0, 1)})
