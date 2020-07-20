@@ -55,7 +55,6 @@ class MissileMan:
     def action(self, state, ship):
         commands = []
 
-        print(state)
         print(ship)
         # 最初の数ターンは様子見
         if self.turn < self.yousumi_turns:
