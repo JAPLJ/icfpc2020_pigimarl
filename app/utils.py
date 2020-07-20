@@ -144,6 +144,38 @@ def fire_target(gravity_r, planet_r, x0, y0, vx0, vy0, turns, ships, max_ln, ub)
     return accs_opt
 
 
+def near_score(gravity_r, planet_r, x0, y0, vx0, vy0, moves, turns, ships):
+    score = 0.0
+    orbit0 = future_orbit(gravity_r, planet_r, x0, y0, vx0, vy0, moves, turns)
+    for s in ships:
+        orbit1 = future_orbit(gravity_r, planet_r, s.x, s.y, s.vx, s.vy, [], turns)
+        for i in range(min(len(orbit0), len(orbit1))):
+            x0, y0 = orbit0[i]
+            x1, y1 = orbit1[i]
+            d = max(abs(x0 - x1), abs(y0 - y1))
+            score += 1.0 / d
+    return score
+
+
+def stalk(gravity_r, planet_r, x0, y0, vx0, vy0, turns, ships, max_ln):
+    score_opt = -1
+    accs_opt = None
+
+    for ln in range(0, max_ln + 1):
+        p = list(range(8))
+        random.shuffle(p)
+        for i in range(8):
+            d = p[i]
+            dx, dy = DX[d], DY[d]
+            ms = [(dx, dy) for i in range(ln)]
+            score = near_score(gravity_r, planet_r, x0, y0, vx0, vy0, ms, turns, ships)
+            if score > score_opt:
+                score_opt = score
+                accs_opt = ms
+
+    return accs_opt
+
+
 # 8 近傍
 neighbours = [(-1, 0), (-1, -1), (0, -1), (1, -1), (1, 0), (1, 1), (0, 1), (-1, 1)]
 
