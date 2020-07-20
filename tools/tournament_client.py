@@ -115,7 +115,8 @@ def main():
     json_log_path = None if len(sys.argv) < 4 else sys.argv[3]
 
     import escaper
-    run(server_url, player_key, escaper.Escaper(), json_log_path=json_log_path)
+    import sniper
+    run(server_url, player_key, sniper.Sniper(), escaper.Escaper(), json_log_path=json_log_path)
 
 
 if __name__ == '__main__':
