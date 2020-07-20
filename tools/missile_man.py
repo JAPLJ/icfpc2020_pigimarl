@@ -39,19 +39,17 @@ class MissileMan:
     def action(self, state, ship):
         commands = []
 
-        if self.go_into_orbit_accels is None:
+        if self.turn % 20 == 0:
             self.go_into_orbit_accels = go_into_orbit(state.planet_radius, ship.x, ship.y, ship.vx, ship.vy)
 
         if len(self.go_into_orbit_accels) > 0:
             ax, ay = self.go_into_orbit_accels.pop(0)
             commands.append({'command': 'accel', 'x': ax, 'y': ay})
-        else:
-            if self.turn % 20 == 0:
-                self.go_into_orbit_accels = go_into_orbit(state.planet_radius, ship.x, ship.y, ship.vx, ship.vy)
-            if self.turn % 2 == 0:
-                commands.append(
-                    {'command': 'split', 'ship_ai_info': ShipAIInfo(Missile([random.choice(neighbours)]), 1, 0, 0, 1)})
 
-            self.turn += 1
+        if self.turn % 2 == 0:
+            commands.append(
+                {'command': 'split', 'ship_ai_info': ShipAIInfo(Missile([random.choice(neighbours)]), 1, 0, 0, 1)})
+
+        self.turn += 1
 
         return commands
