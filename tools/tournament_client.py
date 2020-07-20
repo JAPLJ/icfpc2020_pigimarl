@@ -114,9 +114,15 @@ def main():
     player_key = int(sys.argv[2])
     json_log_path = None if len(sys.argv) < 4 else sys.argv[3]
 
-    import escaper
-    import sniper
-    run(server_url, player_key, sniper.Sniper(), escaper.Escaper(), json_log_path=json_log_path)
+    # sys.setrecursionlimit(1000000)
+    from multiship import Multiship, ShipAIInfo
+    from ship_ai_example import MainShipAI
+    from split_escaper2 import SplitEscaper2
+
+    attacker = ShipAIInfo(MainShipAI(), 152, 0, 10, 120)
+    defender = ShipAIInfo(SplitEscaper(), 128, 0, 10, 100)
+
+    run(server_url, player_key, Multiship(attacker, defender), json_log_path=json_log_path)
 
 
 if __name__ == '__main__':
