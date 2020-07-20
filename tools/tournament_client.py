@@ -116,10 +116,10 @@ def main():
 
     # sys.setrecursionlimit(1000000)
     from multiship import Multiship, ShipAIInfo
-    from ship_ai_example import MainShipAI
+    from missile_man import MissileMan
 
-    attacker = ShipAIInfo(MainShipAI(), 100, 0, 8, 100)
-    defender = ShipAIInfo(MainShipAI(), 100, 0, 8, 100)
+    attacker = ShipAIInfo(MissileMan(), 512 - (12 * 8 + 2 * 128), 0, 8, 128)
+    defender = ShipAIInfo(MissileMan(), 448 - (12 * 8 + 2 * 128), 0, 8, 128)
 
     run(server_url, player_key, Multiship(attacker, defender), json_log_path=json_log_path)
 
