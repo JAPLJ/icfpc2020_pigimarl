@@ -198,5 +198,5 @@ def calc_trajectory(x0, y0, vx0, vy0, moves, turn=255):
         if i < len(moves):
             vx, vy = vx + moves[i][0], vy + moves[i][1]
         (x, y, vx, vy) = next_pos(x, y, vx, vy)
-        if max(abs(x), abs(y)) <= planet_r or max(abs(x), abs(y)) > gravity_r:
-            return False
+        trajectory.append((x, y))
+    return trajectory
