@@ -97,7 +97,7 @@ class Missile:
         else:
             mx, my, _, _ = next_pos(ship.x, ship.y, ship.vx, ship.vy)
             ex, ey, _, _ = next_pos(target_eship.x, target_eship.y, target_eship.vx, target_eship.vy)
-            if is_near(mx, my, ex, ey):
+            if is_near((mx, my), (ex, ey)):
                 commands.append({'command': 'suicide'})
 
         return commands
