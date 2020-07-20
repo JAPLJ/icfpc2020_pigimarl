@@ -9,7 +9,7 @@ import utils
 
 class Escaper:
     COOL_RATE = 16
-    CHECK_TURN = 20 # 今後このターンで墜落・範囲外にならないことを確認
+    CHECK_TURN = 15 # 今後このターンで墜落・範囲外にならないことを確認
     ESCAPE_DMG = 50 # これ以上のダメージ（温度増加含む）で回避行動を取る
 
     def __init__(self):
