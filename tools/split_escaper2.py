@@ -19,6 +19,8 @@ class SplitEscaper2:
         self.past_acc = (0, 0)
         self.mother_id = None
         self.duplication_count = self.DUPLICATION_TURN
+        self.states = []
+        self.target = None
 
     def finc_valid_acc(self, ship, planet_radius, gravity_radius, left_time):
         a_range = range(-ship.max_accel, ship.max_accel + 1)
@@ -46,6 +48,35 @@ class SplitEscaper2:
             return acc_candidate[0]
         return utils.stop(ship.x, ship.y, ship.vx, ship.vy)
 
+    def chase_move(self, state, ship, enemy):
+        a_range = range(-ship.max_accel, ship.max_accel + 1)
+        x = ship.x
+        y = ship.y
+        ex = enemy.x
+        ey = enemy.y
+        evx = enemy.vx
+        evy = enemy.vy
+
+        min_length = 10000
+        best_ax = 0
+        best_ay = 0
+        for ax, ay in product(a_range, a_range):
+            vx = ship.vx + ax
+            vy = ship.vy + ay
+            if not utils.gravity_check(state.planet_radius, state.gravity_radius,
+                                     ship.x, ship.y, vx, vy, [], 30):
+                continue
+                                    
+            for i in range(20):
+                x, y, vx, vy = utils.next_pos(x, y, vx, vy)
+                ex, ey, vx, vy = utils.next_pos(ex, ey, evx, evy)
+                length = abs((x - ex) + (y - ey))
+                if length < min_length:
+                    min_length = length
+                    best_ax = ax
+                    best_ay = ay
+        return best_ax, best_ay
+
     def similar_energy_enemies(self, state, ship):
         count = 0
         current_m_energy = utils.mechanical_energy(ship.x, ship.y, ship.vx, ship.vy)
@@ -58,6 +89,8 @@ class SplitEscaper2:
         return count
 
     def action(self, state, ship):
+        target = state.enemy_ships[0]
+        self.states.append(state)
         commands = []
         self.duplication_count -= 1
         acc = (0, 0)
@@ -69,17 +102,17 @@ class SplitEscaper2:
 
         if len(self.into_orbit_moves) > 0:
             acc = self.into_orbit_moves.pop(0)
-        elif not utils.gravity_check(state.planet_radius, state.gravity_radius,
-                                     ship.x, ship.y, ship.vx, ship.vy, [], left_time):
-            acc = self.finc_valid_acc(ship, state.planet_radius, state.gravity_radius, left_time)
+        # elif not utils.gravity_check(state.planet_radius, state.gravity_radius,
+        #                              ship.x, ship.y, ship.vx, ship.vy, [], left_time):
+        #     acc = self.finc_valid_acc(ship, state.planet_radius, state.gravity_radius, left_time)
+        acc = self.chase_move(state, ship, target)
 
         if acc != (0, 0):
             commands.append({'command': 'accel', 'x': acc[0], 'y': acc[1]})
 
-        if ship.params.soul > 2 or self.duplication_count < 0:
-            acc = self.finc_valid_acc(ship, state.planet_radius, state.gravity_radius, left_time)
-            self.duplication_count = self.DUPLICATION_TURN
-            commands.append({'command': 'split', 'ship_ai_info': ShipAIInfo(SubShipAI(), 0, 0, 0, 1)})
+        # if ship.params.soul > 2 or self.duplication_count < 0:
+        #     self.duplication_count = self.DUPLICATION_TURN
+        #     commands.append({'command': 'split', 'ship_ai_info': ShipAIInfo(SubShipAI(), 0, 0, 0, 1)})
 
         return commands
 
