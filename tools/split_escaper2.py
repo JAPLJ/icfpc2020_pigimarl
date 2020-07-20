@@ -105,7 +105,9 @@ class SplitEscaper2:
         # elif not utils.gravity_check(state.planet_radius, state.gravity_radius,
         #                              ship.x, ship.y, ship.vx, ship.vy, [], left_time):
         #     acc = self.finc_valid_acc(ship, state.planet_radius, state.gravity_radius, left_time)
-        acc = self.chase_move(state, ship, target)
+        if self.duplication_count < 0:
+            self.duplication_count = self.DUPLICATION_TURN
+            acc = self.chase_move(state, ship, target)
 
         if acc != (0, 0):
             commands.append({'command': 'accel', 'x': acc[0], 'y': acc[1]})
