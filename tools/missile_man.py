@@ -46,7 +46,7 @@ class MissileMan:
             ax, ay = self.go_into_orbit_accels.pop(0)
             commands.append({'command': 'accel', 'x': ax, 'y': ay})
         else:
-            if self.turn % 20 == 20:
+            if self.turn % 20 == 0:
                 self.go_into_orbit_accels = go_into_orbit(state.planet_radius, ship.x, ship.y, ship.vx, ship.vy)
             if self.turn % 2 == 0:
                 commands.append(
