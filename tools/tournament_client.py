@@ -24,7 +24,7 @@ def run(server_url, player_key, ai_selector, json_log_path=None):
     json_logging = json_log_path is not None
     json_logs = []
 
-    print('[RUNNER] join game')
+    print('[RUNNER] join game', flush=True)
     req_join = make_req_join(player_key)
     (side, limit, enemy_params) = send(server_url, req_join)
 
@@ -32,7 +32,7 @@ def run(server_url, player_key, ai_selector, json_log_path=None):
     solver = Multiship(ai_info, ai_info)
 
     ship_parameter = solver.set_specs(limit, side)
-    print('[RUNNER] start game, parameter:', ship_parameter.list())
+    print('[RUNNER] start game, parameter:', ship_parameter.list(), flush=True)
     req_start = make_req_start(player_key, ship_parameter)
     state = send(server_url, req_start)
     if json_logging:
@@ -40,7 +40,7 @@ def run(server_url, player_key, ai_selector, json_log_path=None):
 
     while True:
         commands = solver.action(state)
-        print(f'[{datetime.datetime.now()} RUNNER] send commands:', commands)
+        print(f'[{datetime.datetime.now()} RUNNER] send commands:', commands, flush=True)
         req_commands = make_req_commands(player_key, commands)
         state = send(server_url, req_commands)
         if json_logging:
@@ -55,7 +55,7 @@ def run(server_url, player_key, ai_selector, json_log_path=None):
             f.write(json.dumps(json_logs))
             # f.write(f'[{",".join(json_logs)}]')
 
-    print('[RUNNER] game finished')
+    print('[RUNNER] game finished', flush=True)
 
 
 def send(server_url, list_req):
@@ -64,26 +64,26 @@ def send(server_url, list_req):
     req: list（cons形式でない）
     return: state: GameResponseをパースしたもの
     """
-    print(f'[{datetime.datetime.now()} Send] req:', str(list_req)[:100])
+    print(f'[{datetime.datetime.now()} Send] req:', str(list_req)[:100], flush=True)
     cons_req = python_list_to_cons_list_recurse(list_req)
     mod_req = enc_from_cons_obj(cons_req)
     try:
         http_res = requests.post(f'{server_url}/aliens/send?apiKey={API_KEY}', data=mod_req, timeout=10.0)
     except Timeout:
-        print('[Send] timeout')
+        print('[Send] timeout', flush=True)
         exit(2)
     if http_res.status_code != 200:
-        print('[Send] Unexpected server response:')
-        print('[Send] HTTP code:', http_res.status_code)
-        print('[Send] Request:', mod_req)
-        print('[Send] Modulated request:', mod_req)
-        print('[Send] Response body:', http_res.text)
+        print('[Send] Unexpected server response:', flush=True)
+        print('[Send] HTTP code:', http_res.status_code, flush=True)
+        print('[Send] Request:', mod_req, flush=True)
+        print('[Send] Modulated request:', mod_req, flush=True)
+        print('[Send] Response body:', http_res.text, flush=True)
         exit(2)
 
     mod_res = http_res.text
     cons_res = dec_to_cons_obj(mod_res)
     list_res = cons_list_to_python_list_recurse(cons_res)
-    print(f'[{datetime.datetime.now()} Send] res:', str(list_res)[:100])
+    print(f'[{datetime.datetime.now()} Send] res:', str(list_res)[:100], flush=True)
     return parse_game_response(list_res)
 
 
