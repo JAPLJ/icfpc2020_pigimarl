@@ -8,7 +8,7 @@ from utils import *
 def is_near(p0, p1):
     (x0, y0) = p0
     (x1, y1) = p1
-    d = max(abs(x0 - x1), abs(y1 - y2))
+    d = max(abs(x0 - x1), abs(y0 - y1))
     return d <= 3
 
 
