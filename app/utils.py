@@ -4,6 +4,8 @@ from collections import deque
 
 import numpy as np
 
+MAX_TURNS = 384
+
 
 def sign(val):
     if val > 0:
@@ -63,12 +65,12 @@ DY = [-1, 0, 1, 1, 1, 0, -1, -1]
 def gravity_check(gravity_r, planet_r, x0, y0, vx0, vy0, moves, rot_sign=None):
     """
     (x0, y0) から速度 (vx0, vy0) で始めて、かつ最初の len(moves) 回は moves に従って accel するとする
-    このとき 256 ターンにわたって墜落しないかつ外に出ないなら True を返す
+    このとき MAX_TURNS ターンにわたって墜落しないかつ外に出ないなら True を返す
     """
     x, y = x0, y0
     vx, vy = vx0, vy0
     rot_sum = 0
-    for i in range(256):
+    for i in range(MAX_TURNS):
         if i < len(moves):
             vx, vy = vx + moves[i][0], vy + moves[i][1]
         (x, y, vx, vy) = next_pos(x, y, vx, vy)
@@ -82,11 +84,11 @@ def gravity_check(gravity_r, planet_r, x0, y0, vx0, vy0, moves, rot_sign=None):
 
 def go_into_orbit(gravity_r, planet_r, x0, y0, vx0, vy0, rot_sign=None):
     """
-    (x0, y0) から速度 (vx0, vy0) で始めたとき、256 ターンにわたって墜落しないかつ外に出ないような
+    (x0, y0) から速度 (vx0, vy0) で始めたとき、MAX_TURNS ターンにわたって墜落しないかつ外に出ないような
     最初に行うべき accel の列を返す
     """
     ln = 1
-    while True:
+    for _ in range(MAX_TURNS):
         p = list(range(8))
         random.shuffle(p)
         for i in range(8):
@@ -96,15 +98,16 @@ def go_into_orbit(gravity_r, planet_r, x0, y0, vx0, vy0, rot_sign=None):
             if gravity_check(gravity_r, planet_r, x0, y0, vx0, vy0, ms, rot_sign):
                 return ms
         ln += 1
+    return []
 
 def gravity_check_g(planet_r, gravity_r, x0, y0, vx0, vy0, moves):
     """
     (x0, y0) から速度 (vx0, vy0) で始めて、かつ最初の len(moves) 回は moves に従って accel するとする
-    このとき 256 ターンにわたって墜落しないかつ外に出ないなら True を返す
+    このとき MAX_TURNS ターンにわたって墜落しないかつ外に出ないなら True を返す
     """
     x, y = x0, y0
     vx, vy = vx0, vy0
-    for i in range(256):
+    for i in range(MAX_TURNS):
         if i < len(moves):
             vx, vy = vx + moves[i][0], vy + moves[i][1]
         (x, y, vx, vy) = next_pos(x, y, vx, vy)
@@ -115,11 +118,11 @@ def gravity_check_g(planet_r, gravity_r, x0, y0, vx0, vy0, moves):
 
 def go_into_orbit_g(planet_r, gravity_r, x0, y0, vx0, vy0):
     """
-    (x0, y0) から速度 (vx0, vy0) で始めたとき、256 ターンにわたって墜落しないかつ外に出ないような
+    (x0, y0) から速度 (vx0, vy0) で始めたとき、MAX_TURNS ターンにわたって墜落しないかつ外に出ないような
     最初に行うべき accel の列を返す
     """
     ln = 1
-    while True:
+    for _ in range(MAX_TURNS):
         p = list(range(8))
         random.shuffle(p)
         for i in range(8):
@@ -129,6 +132,7 @@ def go_into_orbit_g(planet_r, gravity_r, x0, y0, vx0, vy0):
             if gravity_check_g(planet_r, gravity_r, x0, y0, vx0, vy0, ms):
                 return ms
         ln += 1
+    return []
 
 def future_orbit(gravity_r, planet_r, x0, y0, vx0, vy0, moves, turns):
     x, y = x0, y0
