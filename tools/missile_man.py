@@ -40,7 +40,7 @@ class MissileMan:
         commands = []
 
         # 最初の数ターンは様子見
-        if self.turn < 10:
+        if self.turn < 0:
             gx, gy = calc_gravity(ship.x, ship.y)
             commands.append({'command': 'accel', 'x': -gx, 'y': -gy})
 
