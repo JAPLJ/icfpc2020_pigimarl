@@ -69,7 +69,7 @@ class SplitEscaper2:
                                     
             for i in range(20):
                 x, y, vx, vy = utils.next_pos(x, y, vx, vy)
-                ex, ey, vx, vy = utils.next_pos(ex, ey, evx, evy)
+                ex, ey, evx, evy = utils.next_pos(ex, ey, evx, evy)
                 length = abs(x - ex) + abs(y - ey)
                 if length < min_length:
                     min_length = length
