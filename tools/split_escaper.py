@@ -63,6 +63,6 @@ class DebrisEscaper:
     def __init__(self):
         pass
 
-    def action(self, state, ship):        
+    def action(self, state, ship):
         return []
 
