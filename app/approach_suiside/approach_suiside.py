@@ -36,12 +36,17 @@ class Suicider:
         self.count = count  
 
     def action(self, state, ship):
+        ret = []
+        if ship.params.energy > 0:
+            a = random_direction()
+            ret.append({'command': 'accel', 'x': a[0], 'y': a[1]})
+            
         # カウントが 0 になったら自爆
         if self.count == 0:
-            return [{'command': 'suicide'}]
+            ret.append({'command': 'suicide'})
 
         self.count -= 1
-        return []
+        return ret
 
 
 class MainAI:
@@ -63,35 +68,24 @@ class MainAI:
     def action(self, state: State, ship: Ship) -> Dict[int, List[Dict]]:
 
         ret = []
-        # 分離しない場合を考える
-        if self.stage == 1:
-            # enemy_dist = [max( abs(s1.x - s2.x), abs(s1.y - s2.y)) for s2 in state.enemy_ships]
-            # nearest_enemy_idx = np.argsort(enemy_dist)[0]
-            # s2 = state.enemy_ships[nearest_enemy_idx]
+        # enemy_dist = [max( abs(s1.x - s2.x), abs(s1.y - s2.y)) for s2 in state.enemy_ships]
+        # nearest_enemy_idx = np.argsort(enemy_dist)[0]
+        # s2 = state.enemy_ships[nearest_enemy_idx]
 
-            if not self.into_orbit and len(self.into_orbit_moves) == 0:
-                self.into_orbit_moves = go_into_orbit(state.planet_radius, ship.x, ship.y, ship.vx, ship.vy)
-            elif not self.into_orbit:
-                ms = self.into_orbit_moves[self.into_orbit_idx]
-                ret.append({'command': 'accel', 'x': ms[0], 'y': ms[1]})
-                self.into_orbit_idx += 1
-                self.into_orbit = self.into_orbit_idx == len(self.into_orbit_moves)
-                if self.into_orbit:
-                    self.stage += 1
-        elif self.stage == 2:
-            if ship.params.soul > 1:
-                ret.append({
-                    'command': 'split',
-                    'ship_ai_info': ShipAIInfo(Suicider(count=20), 0, 0, 0, 1)
-                })
-            else:
-                self.stage += 1
-        # elif self.stage == 3:
-        #     for s1 in state.my_ships:
-        #         dx, dy = random_direction()
-        #         ret.append({'command': 'accel', 'x': dx, 'y': dy})
-        #     self.stage += 1
-        
+        if not self.into_orbit and len(self.into_orbit_moves) == 0:
+            self.into_orbit_moves = go_into_orbit(state.planet_radius, ship.x, ship.y, ship.vx, ship.vy)
+        elif not self.into_orbit:
+            ms = self.into_orbit_moves[self.into_orbit_idx]
+            ret.append({'command': 'accel', 'x': ms[0], 'y': ms[1]})
+            self.into_orbit_idx += 1
+            self.into_orbit = self.into_orbit_idx == len(self.into_orbit_moves)
+
+        if ship.params.soul > 1:
+            ret.append({
+                'command': 'split',
+                'ship_ai_info': ShipAIInfo(Suicider(count=20), 1, 0, 0, 1)
+            })
+
         return ret
 
 
