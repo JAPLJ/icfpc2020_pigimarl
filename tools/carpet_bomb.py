@@ -64,7 +64,7 @@ class DebrisBomb:
 
     def action(self, state, ship):
         mother = None
-        for ship in state.ships:
+        for ship in state.my_ships:
             if ship.id == self.mother_id:
                 mother = ship
 
