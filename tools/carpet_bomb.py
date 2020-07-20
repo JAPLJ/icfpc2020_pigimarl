@@ -64,9 +64,9 @@ class DebrisBomb:
 
     def action(self, state, ship):
         mother = None
-        for ship in state.my_ships:
-            if ship.id == self.mother_id:
-                mother = ship
+        for s in state.my_ships:
+            if s.id == self.mother_id:
+                mother = s
 
         (nx, ny, _, _) = next_pos(ship.x, ship.y, ship.vx, ship.vy)
         (mnx, mny, _, _) = next_pos(mother.x, mother.y, mother.vx, mother.vy)
