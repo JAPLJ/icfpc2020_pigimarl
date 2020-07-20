@@ -46,6 +46,7 @@ class SplitEscaper2:
             return acc_candidate[0]
         return stop(ship.x, ship.y, ship.vx, ship.vy
 
+
     def action(self, state, ship):
         commands = []
         self.duplication_cunt -= 1
