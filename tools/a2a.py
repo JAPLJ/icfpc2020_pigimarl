@@ -37,6 +37,8 @@ class Fortress:
                     continue
                 if eship.params.energy > 0:
                     continue
+                if eship.id in self.lock_on:
+                    continue
                 eship_trajectory = calc_trajectory(eship.x, eship.y, eship.vx, eship.vy, [], res_turn)
                 accs = []
                 for ax in range(-2, 3):
@@ -61,6 +63,7 @@ class Fortress:
                     break
 
             if target_eship is not None:
+                self.lock_on.add(target_eship.id)
                 missile = Missile(eship.id, missile_acc)
                 energy = max(abs(missile_acc[0]), abs(missile_acc[1]))
                 commands.append({'command': 'split', 'ship_ai_info': ShipAIInfo(missile, energy, 0, 0, 1)})
