@@ -37,6 +37,36 @@ class Missile:
         return commands
 
 
+class Mine:
+    def __init__(self):
+        pass
+    
+    def action(self, state, ship):
+        commands = []
+
+        nx, ny, _, _ = next_pos(ship.x, ship.y, ship.vx, ship.vy)
+
+        near = False
+        for s in state.enemy_ships:
+            enx, eny, _, _ = next_pos(s.x, s.y, s.vx, s.vy)
+            if max(abs(nx - enx), abs(ny - eny)) <= 3:
+                near = True
+
+        safe = True
+        for s in state.my_ships:
+            mnx, mny, _, _ = next_pos(s.x, s.y, s.vx, s.vy)
+            if max(abs(nx - mnx), abs(ny - mny)) <= 3 and s.params.soul > 1:
+                safe = False
+
+        if near and safe:
+            commands.append({'command': 'suicide'})
+        else:
+            dv, dy = stop(ship,x, ship.y, ship.vx, ship.vy)
+            commands.append({'command': 'accel', 'x': dv, 'y': dy})
+
+        return commands
+
+
 # パラメータはこんな感じで
 # attacker = ShipAIInfo(MissileMan(), 512 - (12 * 8 + 2 * 128), 0, 8, 128)
 # defender = ShipAIInfo(MissileMan(), 448 - (12 * 8 + 2 * 128), 0, 8, 128)
@@ -67,12 +97,17 @@ class MissileMan:
             if len(self.go_into_orbit_accels) > 0:
                 ax, ay = self.go_into_orbit_accels.pop(0)
                 commands.append({'command': 'accel', 'x': ax, 'y': ay})
-            elif self.turn % 2 == 0:
+            elif self.turn % 4 == 0:
                 accels = fire_target(state.gravity_radius, state.planet_radius, ship.x, ship.y, ship.vx, ship.vy,
                                      256 - self.turn, state.enemy_ships, 1, 1000)
                 if accels is not None:
                     commands.append(
                         {'command': 'split', 'ship_ai_info': ShipAIInfo(Missile(accels), len(accels), 0, 0, 1)})
+            elif self.turn % 2 == 0:
+
+                if accels is not None:
+                    commands.append(
+                        {'command': 'split', 'ship_ai_info': ShipAIInfo(Mine, 5, 0, 0, 1)})
 
         self.turn += 1
 
