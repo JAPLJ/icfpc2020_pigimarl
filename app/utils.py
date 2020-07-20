@@ -1,3 +1,4 @@
+
 import random
 from collections import deque
 
@@ -26,7 +27,6 @@ def calc_gravity(x, y):
         return 0, -sign(y)
     else:
         return -sign(x), -sign(y)
-
 
 def laser_damage(atk_ship_x, atk_ship_y, target_x, target_y, laser_power):
     """
@@ -97,6 +97,38 @@ def go_into_orbit(gravity_r, planet_r, x0, y0, vx0, vy0, rot_sign=None):
                 return ms
         ln += 1
 
+def gravity_check_g(planet_r, gravity_r, x0, y0, vx0, vy0, moves):
+    """
+    (x0, y0) から速度 (vx0, vy0) で始めて、かつ最初の len(moves) 回は moves に従って accel するとする
+    このとき 256 ターンにわたって墜落しないかつ外に出ないなら True を返す
+    """
+    x, y = x0, y0
+    vx, vy = vx0, vy0
+    for i in range(256):
+        if i < len(moves):
+            vx, vy = vx + moves[i][0], vy + moves[i][1]
+        (x, y, vx, vy) = next_pos(x, y, vx, vy)
+        if max(abs(x), abs(y)) <= planet_r or max(abs(x), abs(y)) > gravity_r:
+            return False
+    return True
+
+
+def go_into_orbit_g(planet_r, gravity_r, x0, y0, vx0, vy0):
+    """
+    (x0, y0) から速度 (vx0, vy0) で始めたとき、256 ターンにわたって墜落しないかつ外に出ないような
+    最初に行うべき accel の列を返す
+    """
+    ln = 1
+    while True:
+        p = list(range(8))
+        random.shuffle(p)
+        for i in range(8):
+            d = p[i]
+            dx, dy = DX[d], DY[d]
+            ms = [(dx, dy) for i in range(ln)]
+            if gravity_check_g(planet_r, gravity_r, x0, y0, vx0, vy0, ms):
+                return ms
+        ln += 1
 
 def future_orbit(gravity_r, planet_r, x0, y0, vx0, vy0, moves, turns):
     x, y = x0, y0
@@ -140,6 +172,41 @@ def fire_target(gravity_r, planet_r, x0, y0, vx0, vy0, turns, ships, max_ln, ub)
             if mt < mt_opt:
                 mt_opt = mt
                 accs_opt = ms[1:]
+
+    return accs_opt
+
+
+def near_score(gravity_r, planet_r, x0, y0, vx0, vy0, moves, turns, ships):
+    orbit0 = future_orbit(gravity_r, planet_r, x0, y0, vx0, vy0, moves, turns)
+    if len(orbit0) < turns:
+        return 0.0
+
+    score = 0.0
+    for s in ships:
+        orbit1 = future_orbit(gravity_r, planet_r, s.x, s.y, s.vx, s.vy, [], turns)
+        for i in range(min(len(orbit0), len(orbit1))):
+            x0, y0 = orbit0[i]
+            x1, y1 = orbit1[i]
+            d = max(abs(x0 - x1), abs(y0 - y1))
+            score += 1.0 / (d + 1)
+    return score
+
+
+def stalk(gravity_r, planet_r, x0, y0, vx0, vy0, turns, ships, max_ln):
+    score_opt = -1
+    accs_opt = None
+
+    for ln in range(0, max_ln + 1):
+        p = list(range(8))
+        random.shuffle(p)
+        for i in range(8):
+            d = p[i]
+            dx, dy = DX[d], DY[d]
+            ms = [(dx, dy) for i in range(ln)]
+            score = near_score(gravity_r, planet_r, x0, y0, vx0, vy0, ms, turns, ships)
+            if score > score_opt:
+                score_opt = score
+                accs_opt = ms
 
     return accs_opt
 
@@ -217,3 +284,20 @@ def stop(x, y, vx, vy):
 
     gx, gy = calc_gravity(x, y)
     return (_stop(vx, gx), _stop(vy, gy))
+
+
+def guess_next(v):
+    '''
+    list vを受け取って周期性があるかを判定し，ある場合は次の要素を推測する
+    ない場合はNone
+    例: [-1, 0, 1, -1, 0, 1] -> -1
+    '''
+    for p in range(1, len(v) // 2 + 1):
+        ok = True
+        for i in range(len(v) - p):
+            if v[i] != v[i + p]:
+                ok = False
+                break
+        if ok:
+            return v[-p]
+    return None

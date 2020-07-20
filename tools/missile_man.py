@@ -37,6 +37,10 @@ class Missile:
         return commands
 
 
+# パラメータはこんな感じで
+# attacker = ShipAIInfo(MissileMan(), 512 - (12 * 8 + 2 * 128), 0, 8, 128)
+# defender = ShipAIInfo(MissileMan(), 448 - (12 * 8 + 2 * 128), 0, 8, 128)
+
 class MissileMan:
     def __init__(self):
         self.go_into_orbit_accels = None
@@ -60,6 +64,10 @@ class MissileMan:
                 self.go_into_orbit_accels = go_into_orbit(state.gravity_radius, state.planet_radius, ship.x, ship.y,
                                                           ship.vx, ship.vy,
                                                           -rot_sign)
+
+            if len(self.go_into_orbit_accels) == 0 and self.turn % 10 == 0:
+                self.go_into_orbit_accels = stalk(state.gravity_radius, state.planet_radius, ship.x, ship.y, ship.vx,
+                                                  ship.vy, 256 - self.turn, state.enemy_ships, 4)
 
             if len(self.go_into_orbit_accels) > 0:
                 ax, ay = self.go_into_orbit_accels.pop(0)
