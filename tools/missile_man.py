@@ -61,7 +61,7 @@ class Mine:
         if near and safe:
             commands.append({'command': 'suicide'})
         else:
-            dv, dy = stop(ship,x, ship.y, ship.vx, ship.vy)
+            dv, dy = stop(ship.x, ship.y, ship.vx, ship.vy)
             commands.append({'command': 'accel', 'x': dv, 'y': dy})
 
         return commands
@@ -104,10 +104,8 @@ class MissileMan:
                     commands.append(
                         {'command': 'split', 'ship_ai_info': ShipAIInfo(Missile(accels), len(accels), 0, 0, 1)})
             elif self.turn % 2 == 0:
-
-                if accels is not None:
-                    commands.append(
-                        {'command': 'split', 'ship_ai_info': ShipAIInfo(Mine(), 5, 0, 0, 1)})
+                commands.append(
+                    {'command': 'split', 'ship_ai_info': ShipAIInfo(Mine(), 5, 0, 0, 1)})
 
         self.turn += 1
 

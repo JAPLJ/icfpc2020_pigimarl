@@ -12,5 +12,5 @@ class AISelector:
             return ShipAIInfo(MissileMan(), 512 - (12 * 8 + 2 * 128), 0, 8, 128)
         else:
             # enemy_params is None
-            # return ShipAIInfo(MainShipAI(), 100, 0, 8, 100)
-            return ShipAIInfo(MissileMan(), 512 - (12 * 8 + 2 * 128), 0, 8, 128)
+            return ShipAIInfo(MainShipAI(), 100, 0, 8, 100)
+            # return ShipAIInfo(MissileMan(), 512 - (12 * 8 + 2 * 128), 0, 8, 128)
