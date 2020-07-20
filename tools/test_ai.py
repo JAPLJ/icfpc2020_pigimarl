@@ -2,8 +2,6 @@ import sys
 
 from ai_interface import *
 
-sys.path.append('app/')
-
 from utils import *
 
 

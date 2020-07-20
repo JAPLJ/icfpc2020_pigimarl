@@ -2,7 +2,7 @@ from common_interface import *
 from ai_interface import *
 
 import sys
-sys.path.append('app/')
+
 from utils import *
 from collections import defaultdict
 

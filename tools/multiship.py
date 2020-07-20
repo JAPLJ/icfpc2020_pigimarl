@@ -1,7 +1,5 @@
 import sys
 
-sys.path.append('app/')
-
 from conversion import *
 
 

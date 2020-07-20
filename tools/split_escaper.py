@@ -1,7 +1,5 @@
 import sys
 
-sys.path.append('app/')
-
 from multiship import *
 from utils import *
 
