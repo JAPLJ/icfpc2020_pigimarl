@@ -11,6 +11,7 @@ class Missile:
         self.accels = accels
 
     def action(self, state, ship):
+        print(f"[missle] p:{ship.params}\t t:{ship.temp}\t xy:{ship.x}, {ship.y}\t v:{ship.vx}, {ship.vy}")
         commands = []
 
         if len(self.accels) > 0:
@@ -47,22 +48,26 @@ class MissileMan:
         self.turn = 0
 
     def action(self, state, ship):
-        if sum([ship.params.energy, ship.params.laser_power, ship.params.cooling_rate, ship.params.soul]) == 0: return Missile().action(state, ship)
+        print(f"[mother] p:{ship.params}\t t:{ship.temp}\t xy:{ship.x}, {ship.y}\t v:{ship.vx}, {ship.vy}")
+        if sum([ship.params.energy, ship.params.laser_power, ship.params.cooling_rate, ship.params.soul]) == 0:
+            print("もうだめ。。。")
+            return Missile().action(state, ship)
         commands = []
+
+        if ship.temp >= 64 and ship.params.soul >= 2:
+            # 次の子供にすべてを託し、自分はミサイルと化す
+            child = MissileMan()
+            child.go_into_orbit_accels = self.go_into_orbit_accels
+            child.turn = self.turn
+            print(f"私のことはいいから生きて!! tmp {ship.temp} params: {ship.params}")
+            commands.append({'command': 'split', 'ship_ai_info': ShipAIInfo(child, ship.params.energy//2, ship.params.laser_power//2, ship.params.cooling_rate//2, ship.params.soul//2)})
+            return commands
 
         # 最初の数ターンは様子見
         if self.turn < 10:
             gx, gy = calc_gravity(ship.x, ship.y)
             commands.append({'command': 'accel', 'x': -gx, 'y': -gy})
-
         else:
-            if ship.temp >= 64 and ship.params.soul >= 2:
-                # 次の子供にすべてを託し、自分はミサイルと化す
-                child = MissileMan()
-                child.go_into_orbit_accels = self.go_into_orbit_accels
-                child.turn = self.turn
-                commands.append({'command': 'split', 'ship_ai_info': ShipAIInfo(child, ship.params.energy, ship.params.laser_power, ship.params.cooling_rate, ship.params.soul-1)})
-
             if self.go_into_orbit_accels is None:
                 rot_sum = 0
                 for s in state.enemy_ships:
