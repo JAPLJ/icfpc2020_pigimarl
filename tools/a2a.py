@@ -91,9 +91,13 @@ class Missile:
                 break
 
         if target_eship is None:
-            commands.append({'command': 'suicide'})
+            # commands.append({'command': 'suicide'})
+            pass
 
-        elif is_near((ship.x, ship.y), (target_eship.x, target_eship.y)):
+        else:
+            mx, my, _, _ = next_pos(ship.x, ship.y, ship.vx, ship.vy)
+            ex, ey, _, _ = next_pos(target_eship.x, target_eship.y, target_eship.vx, target_eship.vy)
+            if is_near(mx, my, ex, ey):
             commands.append({'command': 'suicide'})
 
         return commands
