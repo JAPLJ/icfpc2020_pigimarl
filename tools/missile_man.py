@@ -15,7 +15,7 @@ class Missile:
 
         if len(self.accels) > 0:
             ax, ay = self.accels.pop(0)
-            commands.append({'command': 'accel', 'x': ax, 'y': ay})
+            commands.append({'command': 'accel', 'x': ax * 2, 'y': ay * 2})
         else:
             nx, ny, _, _ = next_pos(ship.x, ship.y, ship.vx, ship.vy)
 
@@ -48,7 +48,7 @@ class MissileMan:
         else:
             if self.turn % 2 == 0:
                 commands.append(
-                    {'command': 'split', 'ship_ai_info': ShipAIInfo(Missile([random.choice(neighbours)]), 1, 0, 0, 1)})
+                    {'command': 'split', 'ship_ai_info': ShipAIInfo(Missile([random.choice(neighbours)]), 2, 0, 0, 1)})
 
             self.turn += 1
 
