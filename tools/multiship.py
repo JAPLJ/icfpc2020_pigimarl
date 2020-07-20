@@ -86,28 +86,3 @@ class Multiship:
             res[ship.id] = commands
 
         return res
-
-
-class MainShipAI:
-    def __init__(self):
-        pass
-
-    def action(self, state, ship):
-        print(f'MainShipAI: id={ship.id}, x={ship.x}, y={ship.y}')
-
-        gx, gy = calc_gravity(ship.x, ship.y)
-        commands = [{'command': 'accel', 'x': -gx, 'y': -gy}]
-
-        if ship.params.soul > 1:
-            commands.append({'command': 'split', 'ship_ai_info': ShipAIInfo(SubShipAI(), 0, 0, 0, 1)})
-
-        return commands
-
-
-class SubShipAI:
-    def __init__(self):
-        pass
-
-    def action(self, state, ship):
-        print(f'SubShipAI: id={ship.id}, x={ship.x}, y={ship.y}')
-        return []
