@@ -41,7 +41,7 @@ class Sniper:
                     if rc.kind == 0:
                         pvx, pvy = -rc.x, -rc.y
                 
-                (nx, ny, _, _) = next_pos(state.planet_radius, eship.x, eship.y, eship.vx + pvx, eship.vy + pvy)
+                (nx, ny, _, _) = next_pos(eship.x, eship.y, eship.vx + pvx, eship.vy + pvy)
                 max_lp = min(ship.params.laser_power, ship.max_temp - ship.temp)
                 ldmg = laser_damage(ship.x, ship.y, nx, ny, max_lp)
                 edmg = ldmg - (eship.max_temp - eship.temp)
