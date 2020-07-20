@@ -120,7 +120,7 @@ def min_turn(gravity_r, planet_r, x0, y0, vx0, vy0, moves, turns, ships):
         for i in range(min(len(orbit0), len(orbit1))):
             x0, y0 = orbit0[i]
             x1, y1 = orbit1[i]
-            if max(abs(x0 - x1), abs(y0 - y1)) <= 3:
+            if i >= len(moves) and max(abs(x0 - x1), abs(y0 - y1)) <= 3:
                 min_i = min(min_i, i)
     return min_i
 
