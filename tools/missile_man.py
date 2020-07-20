@@ -40,7 +40,7 @@ class MissileMan:
         commands = []
 
         # 最初の数ターンは様子見
-        if self.turn < 0:
+        if self.turn < 10:
             gx, gy = calc_gravity(ship.x, ship.y)
             commands.append({'command': 'accel', 'x': -gx, 'y': -gy})
 
@@ -53,6 +53,8 @@ class MissileMan:
                 self.go_into_orbit_accels = go_into_orbit(state.planet_radius, ship.x, ship.y, ship.vx, ship.vy,
                                                           -rot_sign)
                 print('#######################', self.go_into_orbit_accels)
+                print(gravity_check(state.planet_radius, ship.x, ship.y, ship.vx, ship.vy, self.go_into_orbit_accels,
+                                    -rot_sign))
 
             if len(self.go_into_orbit_accels) > 0:
                 ax, ay = self.go_into_orbit_accels.pop(0)
