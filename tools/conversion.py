@@ -16,8 +16,12 @@ def game_response_to_state(resp):
     game_state = resp[3]
 
     if len(game_state) == 0:
-        # (side, limit)
-        return (my_side, game_info[2][0])
+        # (side, limit, enemy_params)
+        if my_side == Side.ATTACK:
+            enemy_params = ShipParameter(game_info[4][0], game_info[4][1], game_info[4][2], game_info[4][3])
+        else:
+            enemy_params = None
+        return (my_side, game_info[2][0], enemy_params)
 
     # game_state = [ turn, gravity, ships ]
     current_turn = game_state[0]
