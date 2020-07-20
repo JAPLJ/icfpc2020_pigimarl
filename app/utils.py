@@ -167,3 +167,20 @@ def stop(x, y, vx, vy):
 
     gx, gy = calc_gravity(x, y)
     return (_stop(vx, gx), _stop(vy, gy))
+
+
+def guess_next(v):
+    '''
+    list vを受け取って周期性があるかを判定し，ある場合は次の要素を推測する
+    ない場合はNone
+    例: [-1, 0, 1, -1, 0, 1] -> -1
+    '''
+    for p in range(1, len(v) // 2 + 1):
+        ok = True
+        for i in range(len(v) - p):
+            if v[i] != v[i + p]:
+                ok = False
+                break
+        if ok:
+            return v[-p]
+    return None

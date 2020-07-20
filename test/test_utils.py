@@ -29,3 +29,9 @@ for y in range(0, 33):
 
 # 自分と同じ座標に射出してもフルダメージ
 assert laser_damage(0, 0, 0, 0, 100) == 300
+
+
+assert guess_next([0, 1, 0, 1, 0, 1, 0]) == 1
+assert guess_next([0, 0, 0, 0]) == 0
+assert guess_next([-1, 0, 1, -1, 0, 1]) == -1
+assert guess_next([3, 1, 4, 1, 5, 9, 2, 6]) == None
