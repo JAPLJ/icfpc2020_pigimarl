@@ -68,11 +68,11 @@ class DebrisBomb:
             if ship.id == self.mother_id:
                 mother = ship
 
+        (nx, ny, _, _) = next_pos(ship.x, ship.y, ship.vx, ship.vy)
         (mnx, mny, _, _) = next_pos(mother.x, mother.y, mother.vx, mother.vy)
         if abs(nx -  mnx) <= 3 and abs(ny - mny) <= 3:
             return []
 
-        (nx, ny, _, _) = next_pos(ship.x, ship.y, ship.vx, ship.vy)
         for eship in state.enemy_ships:
             (enx, eny, _, _) = next_pos(eship.x, eship.y, eship.vx, eship.vy)
             if abs(nx - enx) <= 3 and abs(ny - eny) <= 3:
