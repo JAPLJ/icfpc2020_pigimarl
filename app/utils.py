@@ -60,23 +60,27 @@ DX = [-1, -1, -1, 0, 1, 1, 1, 0]
 DY = [-1, 0, 1, 1, 1, 0, -1, -1]
 
 
-def gravity_check(planet_r, x0, y0, vx0, vy0, moves):
+def gravity_check(gravity_r, planet_r, x0, y0, vx0, vy0, moves, rot_sign=None):
     """
     (x0, y0) から速度 (vx0, vy0) で始めて、かつ最初の len(moves) 回は moves に従って accel するとする
     このとき 256 ターンにわたって墜落しないかつ外に出ないなら True を返す
     """
     x, y = x0, y0
     vx, vy = vx0, vy0
+    rot_sum = 0
     for i in range(256):
         if i < len(moves):
             vx, vy = vx + moves[i][0], vy + moves[i][1]
         (x, y, vx, vy) = next_pos(x, y, vx, vy)
-        if max(abs(x), abs(y)) <= planet_r:
+        rot_sum += x * vy - y * vx
+        if max(abs(x), abs(y)) <= planet_r or max(abs(x), abs(y)) > gravity_r:
             return False
-    return True
+    if rot_sign is None:
+        return True
+    return sign(rot_sum) == rot_sign
 
 
-def go_into_orbit(planet_r, x0, y0, vx0, vy0):
+def go_into_orbit(gravity_r, planet_r, x0, y0, vx0, vy0, rot_sign=None):
     """
     (x0, y0) から速度 (vx0, vy0) で始めたとき、256 ターンにわたって墜落しないかつ外に出ないような
     最初に行うべき accel の列を返す
@@ -89,9 +93,55 @@ def go_into_orbit(planet_r, x0, y0, vx0, vy0):
             d = p[i]
             dx, dy = DX[d], DY[d]
             ms = [(dx, dy) for i in range(ln)]
-            if gravity_check(planet_r, x0, y0, vx0, vy0, ms):
+            if gravity_check(gravity_r, planet_r, x0, y0, vx0, vy0, ms, rot_sign):
                 return ms
         ln += 1
+
+
+def future_orbit(gravity_r, planet_r, x0, y0, vx0, vy0, moves, turns):
+    x, y = x0, y0
+    vx, vy = vx0, vy0
+    orbit = []
+    for i in range(turns):
+        if i < len(moves):
+            vx, vy = vx + moves[i][0], vy + moves[i][1]
+        (x, y, vx, vy) = next_pos(x, y, vx, vy)
+        if max(abs(x), abs(y)) <= planet_r or max(abs(x), abs(y)) > gravity_r:
+            break
+        orbit.append((x, y))
+    return orbit
+
+
+def min_turn(gravity_r, planet_r, x0, y0, vx0, vy0, moves, turns, ships):
+    orbit0 = future_orbit(gravity_r, planet_r, x0, y0, vx0, vy0, moves, turns)
+    min_i = 1000
+    for s in ships:
+        orbit1 = future_orbit(gravity_r, planet_r, s.x, s.y, s.vx, s.vy, [], turns)
+        for i in range(min(len(orbit0), len(orbit1))):
+            x0, y0 = orbit0[i]
+            x1, y1 = orbit1[i]
+            if i >= len(moves) and max(abs(x0 - x1), abs(y0 - y1)) <= 3:
+                min_i = min(min_i, i)
+    return min_i
+
+
+def fire_target(gravity_r, planet_r, x0, y0, vx0, vy0, turns, ships, max_ln, ub):
+    mt_opt = ub + 1
+    accs_opt = None
+
+    for ln in range(1, max_ln + 1):
+        p = list(range(8))
+        random.shuffle(p)
+        for i in range(8):
+            d = p[i]
+            dx, dy = DX[d], DY[d]
+            ms = [(0, 0)] + [(dx, dy) for i in range(ln)]
+            mt = min_turn(gravity_r, planet_r, x0, y0, vx0, vy0, ms, turns, ships)
+            if mt < mt_opt:
+                mt_opt = mt
+                accs_opt = ms[1:]
+
+    return accs_opt
 
 
 # 8 近傍

@@ -6,9 +6,7 @@ from requests.exceptions import Timeout
 from cons_list import *
 from conversion import *
 from mod_dem import *
-
-from multiship import Multiship, ShipAIInfo
-
+from multiship import Multiship
 
 API_KEY = 'c16bab7da69d411da59ce8227e5d9034'
 
@@ -117,7 +115,7 @@ def main():
 
     # sys.setrecursionlimit(1000000)
     from ai_selector import AISelector
-    
+
     run(server_url, player_key, AISelector(), json_log_path=json_log_path)
 
 
