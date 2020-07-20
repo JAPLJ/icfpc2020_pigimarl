@@ -52,7 +52,7 @@ class MissileMan:
                 rot_sign = 1 if rot_sum > 0 else -1
                 self.go_into_orbit_accels = go_into_orbit(state.planet_radius, ship.x, ship.y, ship.vx, ship.vy,
                                                           -rot_sign)
-                print('######################', self.go_into_orbit_accels)
+                print('#######################', self.go_into_orbit_accels)
 
             if len(self.go_into_orbit_accels) > 0:
                 ax, ay = self.go_into_orbit_accels.pop(0)
