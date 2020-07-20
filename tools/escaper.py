@@ -19,8 +19,17 @@ class Escaper:
     def finc_valid_acc(self, ship, planet_radius, gravity_radius):
         a_range = range(-ship.max_accel, ship.max_accel + 1)
         acc_candidate = []
+        current_energy = utils.mechanical_energy(ship.x, ship.y, ship.vx, ship.vy)
         for ax, ay in product(a_range, a_range):
             if (ax, ay) == (0, 0):
+                continue
+            next_energy = utils.mechanical_energy(
+                ship.x,
+                ship.y,
+                ship.vx + ax,
+                ship.vy + ay
+            )
+            if current_energy > next_energy and current_energy < 80:
                 continue
             moves = [(ax, ay)]
             if utils.gravity_check(planet_radius, gravity_radius,
