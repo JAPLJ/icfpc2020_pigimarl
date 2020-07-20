@@ -85,7 +85,7 @@ class CarpetBombMother:
         elif ship.params.soul >= 2:
             res.append({'command': 'split', 'ship_ai_info': ShipAIInfo(DebrisBomb(ship.id), 0, 0, 0, 1)})
         
-        if self.params.laser_power > 0:
+        if ship.params.laser_power > 0:
             max_dmg = 0
             to_attack = None
             target = None
