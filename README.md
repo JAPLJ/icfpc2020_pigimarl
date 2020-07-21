@@ -24,7 +24,7 @@ In short, `tools/` contains almost all of our programs.
 ### Platform for developing AIs
 
 - `tools/ai_interface.py`, `tools/common_interface.py`, `tools/conversion.py`: define data types and implement conversions between an encoded list used to HTTP Proxy and the corresponding decoded game state information provided to AI
-- `tools/tournament_client.py`: **TODO**
+- `tools/tournament_client.py`: send ship commands decided by AIs to alian server and pass its response to AIs
 - `tools/multiship.py`, `tools/ai_selector.py`: utility wrapper classes for AIs.
 
 ### AIs
