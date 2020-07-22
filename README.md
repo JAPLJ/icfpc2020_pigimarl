@@ -19,7 +19,7 @@ In short, `tools/` contains almost all of our programs.
 - `tools/galaxy_lazy.py` is the interpreter of galaxy implemented in Python. The interpreter simply parses an input and evaluates it, and all the expression are lazily evaluated. The source file also contains several utility functions for conversion between a list in lambda calculus form and a cons list using Python tuples.
 - `tools/client.py`, `tools/annotate_picture.py`, `tools/multiple_draw.py`: **TODO**
 - `tools/api_server.py`: **TODO**
-- `visualizer.html`: **TODO**
+- `visualizer.html`: is the visualizer to explore galaxy by cliciking. 
 
 ### Platform for developing AIs
 
@@ -37,7 +37,7 @@ There are three types of AIs we will use in the final game.
 
 ### Game visualizer
 
-- `game_state_player.html`: **TODO**
+- `game_state_player.html`: is the tournament game visualizer. However, we did't use it because the official visualizer was useful enough.
 
 ### Misc.
 
